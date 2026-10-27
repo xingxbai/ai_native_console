@@ -1,6 +1,6 @@
 # AI Native Console：40 Day 课程总表
 
-锁定日期：2026-10-27。**本文件是唯一的 Day 顺序依据**。40 Day 的顺序和主题来自根目录 `AI_Native_Console_Codex_第一条指令_完整Day课程锁定.md`；原最终总控仍约束安全、质量、教学格式与技术准确性。旧 L00–L15 的主题对应见 [覆盖矩阵](COVERAGE_MATRIX.md)，既有 L00 课件作为历史记录保留。Day 03 曾应用户要求先于 Day 02 实施；Day 02 现已补课验收，见 [决策日志](DECISION_LOG.md)。
+锁定日期：2026-10-27。**本文件是唯一的 Day 顺序依据**。40 Day 的顺序和主题来自根目录 `AI_Native_Console_Codex_第一条指令_完整Day课程锁定.md`；原最终总控仍约束安全、质量、教学格式与技术准确性。旧 L00–L15 的主题对应见 [覆盖矩阵](COVERAGE_MATRIX.md)，既有 L00 课件作为历史记录保留。Day 03 曾先于 Day 02 实施，Day 02 已补齐；用户后来明确取消 Mock 模型逻辑，当前与后续模型调用只使用 DeepSeek，见 [决策日志](DECISION_LOG.md)。
 
 状态：`IN_PROGRESS` 正在实施，`NOT_STARTED` 只排入计划，`DEFERRED` 为用户明确跳过但仍须完成，`COMPLETED` 有课件和实际验收证据。预计用时为单日学习目标；复杂主题可分次练习。
 
@@ -10,8 +10,8 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 01 | 仓库体检与最小全栈骨架 | 启动并解释前后端边界 | Node/pnpm、workspace、Next、Fastify、密钥隔离 | 静态 Dashboard、`GET /health`、脚本 | install/lint/typecheck/test/build、页面与 health、异常路由 | 骨架优先、前后端职责、AI Coding 验证 | 无；复用既有 L00 | 45–60 分钟 | COMPLETED |
 | 02 | 开发环境、API 契约与错误边界 | 建立可验证接口约定 | 环境配置、运行时校验、错误体、requestId | 配置模块、共享 API 契约 | 缺配置、无效输入、错误码和 ID | 类型与运行时校验区别 | 01 | 45–60 分钟 | COMPLETED |
-| 03 | 模型服务适配层与密钥安全 | Mock 可重复，Key 仅服务端 | DeepSeek、Vercel AI SDK/provider adapter、模型配置、Mock | Mock/DeepSeek provider 接口 | 无 Key、错误 Key、Mock 一致性 | provider 隔离与密钥安全 | 02（曾先行实施，现已补齐） | 45–60 分钟 | COMPLETED |
-| 04 | 第一次非流式 LLM 调用 | 解释最小模型请求 | system/user/assistant、超时、输出限制 | 非流式问答 API、评测样例 | Mock 成功、超时、模型不可用 | 模型回答不是业务事实 | 03 | 45–60 分钟 | NOT_STARTED |
+| 03 | 模型服务适配层与密钥安全 | DeepSeek Key 仅服务端 | DeepSeek、Vercel AI SDK/provider adapter、模型配置 | DeepSeek provider 接口 | 缺 Key、非法模型、真实连通性 | provider 隔离与密钥安全 | 02（曾先行实施，现已补齐） | 45–60 分钟 | COMPLETED |
+| 04 | 第一次非流式 LLM 调用 | 解释最小模型请求 | system/user/assistant、超时、输出限制 | 非流式问答 API、评测样例 | DeepSeek 成功、超时、模型不可用 | 模型回答不是业务事实 | 03 | 45–60 分钟 | COMPLETED |
 | 05 | 流式协议入门与 SSE 帧解析 | 区分 chunk 与事件 | HTTP 响应流、SSE、WebSocket、UTF-8、心跳、AI SDK 协议 | 明确协议的前后端流 | 拆帧/合帧、慢读、异常结束 | SSE/WebSocket、EventSource/POST fetch | 04 | 60 分钟 | NOT_STARTED |
 
 ## Week 2：Streaming、Partial JSON 与 Generative UI
@@ -81,12 +81,12 @@
 | 36 | 模型降级、限流、缓存与并发预算 | 压力下提供可控降级 | fallback、rate limit、cache key、熔断、预算 | 降级与限流入口 | 主模型失败、突发并发、隔离 | 成本/延迟/质量取舍 | 03–04、15、35 | 60 分钟 | NOT_STARTED |
 | 37 | 企业安全、RBAC、租户隔离与审计 | 服务端最小权限 | RBAC、归属、租户、审计、威胁模型 | 安全策略和权限测试 | 跨租户、角色不足、伪造审批 | Prompt 不能做权限 | 13、19、25、29 | 60 分钟 | NOT_STARTED |
 | 38 | Docker、环境配置与 CI 检查 | 可复现构建部署 | 容器、配置、密钥、health、CI | Docker/CI/部署文档 | 冷启动、缺密钥、构建、health | 从本地到部署风险 | 01、35–37 | 60 分钟 | NOT_STARTED |
-| 39 | 端到端测试与故障注入 | 跨层验证失败路径 | Mock LLM、断流、超时、工具失败、恶意输入 | Playwright E2E、故障报告 | 隔离、取消、审批、恢复回归 | 如何证明系统可靠 | 30、34、37–38 | 60 分钟 | NOT_STARTED |
+| 39 | 端到端测试与故障注入 | 跨层验证失败路径 | 真实 DeepSeek 请求、受控断流/超时/工具失败、恶意输入 | Playwright E2E、故障报告 | 隔离、取消、审批、恢复回归 | 如何证明系统可靠 | 30、34、37–38 | 60 分钟 | NOT_STARTED |
 | 40 | 最终演示、架构复盘与模拟面试 | 诚实展示实现与取舍 | demo、架构、指标、简历措辞、限制 | 作品集、演示脚本、题库 | 5 分钟启动演示、现场改动复测 | Agent/Workflow/RAG/安全/评测 | 01–39 | 60 分钟 | NOT_STARTED |
 
 ## 排程检查
 
-- 8 周各 5 Day，共 **40 Day**；Day 01–03 有课件、代码和验收记录，Day 04–40 仍仅有计划。
+- 8 周各 5 Day，共 **40 Day**；Day 01–04 有课件、代码和验收记录，Day 05–40 仍仅有计划。
 - 每个 Day 开始前读取本表、[进度](PROGRESS.md)、[覆盖矩阵](COVERAGE_MATRIX.md)和前一日验收；完成后记录真实测试。
 - 依赖顺序：Web/API → provider/流式 → 工具/上下文/安全 → LangGraph/HITL → 工作流 → 数据/RAG/评测 → 生产化与面试。版本敏感 API 到相应 Day 才核对并安装。
 - 与本表冲突的新想法先写入 [决策日志](DECISION_LOG.md)；课程顺序或技术栈只在用户同意后调整。

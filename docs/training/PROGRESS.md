@@ -1,13 +1,15 @@
 # 学习进度
 
-更新日期：2026-10-27。**Day 01、Day 02、Day 03 已完成；Day 04 未开始。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 现已补齐并验收；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。
+更新日期：2026-10-27。**Day 01–04 已完成；Day 05 未开始。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户现已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
+
+当前练习主线：主页直接显示面试题与真实工程情境入口；每题通过同源接口向 DeepSeek 发一次请求。情境题只用于讨论方案，当前没有订单数据、文档检索、业务工具或审批执行。独立模型 smoke 脚本和旧的课程状态/未来模块占位已删除。[README](../../README.md)说明现行操作，[面试题库](interview-question-bank.md)区分已实现与待实现。
 
 | Day | 状态 | 证据/下一步 |
 | --- | --- | --- |
 | 01 仓库体检与最小全栈骨架 | COMPLETED | [Day 01 课件](lessons/day-01-repository-bootstrap.md)：锁文件安装、lint、typecheck、3/3 测试、build；Web/API 200，异常请求 404 |
 | 02 开发环境、API 契约与错误边界 | COMPLETED | [Day 02 课件](lessons/day-02-api-contracts.md)：共享 Zod 契约、配置校验、统一错误体与 UUID requestId；25/25 测试、lint/typecheck/build、真实 HTTP 200/400 和页面连接状态 |
-| 03 模型服务适配层与密钥安全 | COMPLETED | [Day 03 课件](lessons/day-03-deepseek-provider.md)：Mock/DeepSeek 适配、8/8 测试、lint/typecheck/build、真实短回复 `OK` |
-| 04 第一次非流式 LLM 调用 | NOT_STARTED | - |
+| 03 模型服务适配层与密钥安全 | COMPLETED | [Day 03 课件](lessons/day-03-deepseek-provider.md)记录当时的适配与烟测；当前 Mock 已按用户要求删除，仅保留 DeepSeek provider。 |
+| 04 第一次非流式 LLM 调用 | COMPLETED | [Day 04 课件](lessons/day-04-first-llm-call.md)：单次问答 API/页面、输入/超时/错误/输出边界；当前 DeepSeek-only 复验见[最小评测样例](../evals/day-04-smoke.md)。旧测试文件删除后保留的 21/21 测试、lint/typecheck/build 通过。 |
 | 05 流式协议入门与 SSE 帧解析 | NOT_STARTED | - |
 | 06 React 流式消费与消息状态管理 | NOT_STARTED | - |
 | 07 AbortController 与 Node.js 取消传播 | NOT_STARTED | - |
@@ -51,7 +53,10 @@
 
 ## 当前问题
 
+- 本轮整理后最终 `pnpm lint`、`pnpm typecheck`、`pnpm test`（API 15/15、Web 6/6）、`pnpm build` 均 exit 0；首页和 `/health` 返回 200。真实场景题发现默认思考模式会耗尽输出 token 并导致 502，修正为关闭思考模式、1024 token 上限、拒绝截断结果后，面试题和订单审批题均从同源入口返回 200 与正文。细节见 Day 04 课件；未做浏览器自动点击或手机截图。
+
 - 独立 Gemini 原始大纲文件未在仓库找到；现阶段只可对照最终总控中已整合的五部分和明确知识点。详情见 [覆盖矩阵](COVERAGE_MATRIX.md)。
 - 课程顺序从 16 课切为 40 Day、Day 03 提前实施和 Day 02 补课的依据及版本敏感 API 风险见 [决策日志](DECISION_LOG.md)。
 - 页面手机宽度视觉检查留给学习者手动验收；未宣称自动视觉测试通过。
-- 当前仅有 Dashboard 对 `/health` 的连接检查；用户聊天接口、模型错误映射和完整请求链路仍属 Day 04 以后。
+- 当前已支持单次非流式 DeepSeek 问答；没有会话记忆、流式协议、工具调用或鉴权。API 缺 Key 不启动，且只绑定回环地址；公开部署前必须补鉴权、限流与成本控制。
+- 用户提供的 DeepSeek Key 曾出现在对话中；已再次提醒轮换，不能把 Git ignore 当作轮换替代。

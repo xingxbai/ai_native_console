@@ -4,13 +4,23 @@ export type ApiHealth =
   | { status: "connected"; requestId: string }
   | { status: "unavailable" };
 
-export async function readApiHealth(): Promise<ApiHealth> {
+export function getApiInternalUrl(): URL | null {
   try {
     const baseUrl = new URL(process.env.API_INTERNAL_URL ?? "http://127.0.0.1:3101");
     if (!["http:", "https:"].includes(baseUrl.protocol) || baseUrl.username || baseUrl.password
       || baseUrl.pathname !== "/" || baseUrl.search || baseUrl.hash) {
-      return { status: "unavailable" };
+      return null;
     }
+    return baseUrl;
+  } catch {
+    return null;
+  }
+}
+
+export async function readApiHealth(): Promise<ApiHealth> {
+  try {
+    const baseUrl = getApiInternalUrl();
+    if (!baseUrl) return { status: "unavailable" };
 
     const response = await fetch(new URL("/health", baseUrl), {
       cache: "no-store",

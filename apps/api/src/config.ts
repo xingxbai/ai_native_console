@@ -22,3 +22,17 @@ export function loadApiConfig(env: Record<string, string | undefined> = process.
   }
   return { host: result.data.API_HOST, port: result.data.API_PORT };
 }
+
+export function loadDeepSeekConfig(env: Record<string, string | undefined> = process.env) {
+  const result = z.object({
+    DEEPSEEK_API_KEY: z.string().trim().min(1),
+    DEEPSEEK_MODEL: z.enum(["deepseek-v4-flash", "deepseek-v4-pro"]).default("deepseek-v4-flash"),
+  }).safeParse(env);
+  if (!result.success) {
+    throw new ConfigError([...new Set(result.error.issues.map((issue) => String(issue.path[0])))]);
+  }
+  return {
+    apiKey: result.data.DEEPSEEK_API_KEY,
+    model: result.data.DEEPSEEK_MODEL,
+  };
+}

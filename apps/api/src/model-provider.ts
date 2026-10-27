@@ -3,48 +3,58 @@ import { generateText } from "ai";
 import { z } from "zod";
 
 const promptSchema = z.string().trim().min(1).max(500);
-const configSchema = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("mock") }),
-  z.object({
-    kind: z.literal("deepseek"),
-    apiKey: z.string().trim().min(1),
-    model: z.enum(["deepseek-v4-flash", "deepseek-v4-pro"]).default("deepseek-v4-flash"),
-  }),
-]);
+const instructionsSchema = z.string().trim().min(1).max(500);
+const configSchema = z.object({
+  apiKey: z.string().trim().min(1),
+  model: z.enum(["deepseek-v4-flash", "deepseek-v4-pro"]).default("deepseek-v4-flash"),
+});
 
 export type ModelProvider = {
-  kind: "mock" | "deepseek";
   model: string;
-  generate(prompt: string): Promise<string>;
+  generateReply(instructions: string, prompt: string): Promise<string>;
 };
 
-export function createModelProvider(input: unknown): ModelProvider {
-  const config = configSchema.parse(input);
+export class ModelTimeoutError extends Error {
+  constructor() {
+    super("Model request timed out");
+    this.name = "ModelTimeoutError";
+  }
+}
 
-  if (config.kind === "mock") {
-    return {
-      kind: "mock",
-      model: "deterministic-mock",
-      async generate(prompt) {
-        return `Mock response: ${promptSchema.parse(prompt)}`;
-      },
-    };
+export class ModelOutputLimitError extends Error {
+  constructor() {
+    super("Model output reached the token limit");
+    this.name = "ModelOutputLimitError";
+  }
+}
+
+export function createDeepSeekProvider(input: unknown): ModelProvider {
+  const config = configSchema.parse(input);
+  const deepSeek = createDeepSeek({ apiKey: config.apiKey });
+  const model = config.model;
+
+  async function generateReply(instructions: string, prompt: string) {
+    const abortSignal = AbortSignal.timeout(20_000);
+    try {
+      const result = await generateText({
+        model: deepSeek(model),
+        instructions: instructionsSchema.parse(instructions),
+        prompt: promptSchema.parse(prompt),
+        providerOptions: { deepseek: { thinking: { type: "disabled" } } },
+        maxOutputTokens: 1024,
+        maxRetries: 0,
+        abortSignal,
+      });
+      if (result.finishReason === "length") throw new ModelOutputLimitError();
+      return result.text;
+    } catch (error) {
+      if (abortSignal.aborted) throw new ModelTimeoutError();
+      throw error;
+    }
   }
 
-  const deepSeek = createDeepSeek({ apiKey: config.apiKey });
-
   return {
-    kind: "deepseek",
-    model: config.model,
-    async generate(prompt) {
-      const result = await generateText({
-        model: deepSeek(config.model),
-        prompt: promptSchema.parse(prompt),
-        maxOutputTokens: 64,
-        maxRetries: 0,
-        abortSignal: AbortSignal.timeout(20_000),
-      });
-      return result.text;
-    },
+    model,
+    generateReply,
   };
 }
