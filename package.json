@@ -1,0 +1,18 @@
+{
+  "name": "ai-native-console",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@7.9.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "lint": "eslint apps --ext .ts,.tsx",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm --filter @ai-native-console/api test",
+    "build": "pnpm -r build"
+  },
+  "devDependencies": {
+    "eslint": "9.39.1",
+    "typescript-eslint": "8.46.4",
+    "typescript": "5.9.3"
+  }
+}
