@@ -10,6 +10,8 @@
 | D-002 / 2026-10-27 | Day 01 复用当前 Next.js/Fastify 最小骨架，并独立复测、写新课件；不覆盖旧 L00 课件。 | 当前仓库已有可运行工程，第二份文件要求先读现有文件且不得覆盖。 | Day 01 执行命令和 HTTP 结果记在独立课件。 |
 | D-003 / 2026-10-27 | Day 01 不安装 AI SDK、LangGraph、Zustand、ECharts、React Flow。 | 总控要求按课程渐进引入；40 Day 计划分别从 Day 03/06/10/21/26 开始。 | 查看 package 和锁文件；Day 01 只验收 Dashboard/health。 |
 | D-004 / 2026-10-27 | 模型供应商选定 DeepSeek；密钥只通过服务端环境变量提供，不写入仓库、前端或课程文档。 | 用户已确认按原顺序推进：Day 02 建立安全配置边界，Day 03 实现 provider adapter，Day 04 验证首次模型调用。 | 到相应 Day 核对 DeepSeek 官方 API、AI SDK 兼容方式与安装版本，使用 Mock 和受控真实请求验证。 |
+| D-005 / 2026-10-27 | 应用户最新明确要求，先执行 Day 03；Day 02 延期，保留原主题和前置缺口。 | 最新指令覆盖了之前“按原顺序”的选择。为安全接入，只实现 Day 03 所需的本地密钥与模型 ID 校验；共享 API 契约、requestId、统一错误边界仍属 Day 02，Day 04 不提前开始。 | Day 03 单独课件、真实测试；进度表将 Day 02 标为 DEFERRED。 |
+| D-006 / 2026-10-27 | 用户明确要求补做 Day 02；保留 Day 03 已完成事实，不重写历史顺序。 | 新增独立 contracts 工作区供 Next/Fastify 共用；API 使用服务端生成 UUID，Web 服务端只读健康检查；不接聊天或模型请求。 | Day 02 独立课件、25 个测试、lint/typecheck/build、真实 HTTP 与页面状态；Day 02 改为 COMPLETED。 |
 
 ## 待决策与风险
 
@@ -20,3 +22,4 @@
 | P-003 | `@streamparser/json`、`parsePartialJson` 与 SDK partial output 的适用边界须实测。 | Day 08 对比原始 JSON 增量流和 SDK 结构化流；不得用正则补全任意 JSON。 | 08；实际版本、类型和异常 EOF 测试。 |
 | P-004 | LangGraph 的 `StateGraph`、`interrupt()`、`Command`、checkpointer API 和持久后端待确定。 | Day 21–25 才安装核对；MemorySaver 只作进程内示例，不能当重启恢复方案。 | 21–25；LangGraph 官方文档和重启测试。 |
 | P-005 | 本机 pnpm 7.9.0 可完成 Day 01，但未来依赖可能要求更高版本。 | 不擅自升级；到具体安装 Day 检查 engines、锁文件和实际命令，再提出兼容方案。 | 03、21 等安装日；包元数据与安装结果。 |
+| P-006 | 同一个 DeepSeek 密钥已经出现在对话记录中。 | 本轮密钥仅保存在 Git 忽略且文件权限为 600 的 `apps/api/.env.local`；不写入日志、文档或前端。建议用户在 DeepSeek 控制台轮换后更新本地文件。 | 03；`git check-ignore`、文件权限与轮换后的连通性检查。 |

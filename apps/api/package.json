@@ -12,6 +12,7 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
+    "@ai-native-console/contracts": "workspace:*",
     "@ai-sdk/deepseek": "3.0.74",
     "ai": "7.0.154",
     "fastify": "5.12.7",

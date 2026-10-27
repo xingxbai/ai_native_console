@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "packageManager": "pnpm@7.9.0",
   "scripts": {
-    "dev": "pnpm -r --parallel dev",
-    "lint": "eslint apps --ext .ts,.tsx",
-    "typecheck": "pnpm -r typecheck",
-    "test": "pnpm --filter @ai-native-console/api test",
+    "prepare:contracts": "pnpm --filter @ai-native-console/contracts build",
+    "dev": "pnpm prepare:contracts && pnpm -r --parallel dev",
+    "lint": "eslint apps packages --ext .ts,.tsx",
+    "typecheck": "pnpm prepare:contracts && pnpm -r typecheck",
+    "test": "pnpm prepare:contracts && pnpm -r test",
     "build": "pnpm -r build"
   },
   "devDependencies": {

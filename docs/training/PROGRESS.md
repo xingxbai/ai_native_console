@@ -1,12 +1,12 @@
 # 学习进度
 
-更新日期：2026-10-27。**Day 01 已完成；等待用户检查，不自动进入 Day 02。** 课程顺序以 [40 Day 总表](CURRICULUM.md) 为准，旧 L00–L15 编号只用于追溯；既有 L00 骨架与记录保留，本轮已独立复测并生成 Day 01 课件。
+更新日期：2026-10-27。**Day 01、Day 02、Day 03 已完成；Day 04 未开始。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 现已补齐并验收；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。
 
 | Day | 状态 | 证据/下一步 |
 | --- | --- | --- |
 | 01 仓库体检与最小全栈骨架 | COMPLETED | [Day 01 课件](lessons/day-01-repository-bootstrap.md)：锁文件安装、lint、typecheck、3/3 测试、build；Web/API 200，异常请求 404 |
-| 02 开发环境、API 契约与错误边界 | NOT_STARTED | 等待 Day 01 验收与用户指示 |
-| 03 模型服务适配层与密钥安全 | NOT_STARTED | - |
+| 02 开发环境、API 契约与错误边界 | COMPLETED | [Day 02 课件](lessons/day-02-api-contracts.md)：共享 Zod 契约、配置校验、统一错误体与 UUID requestId；25/25 测试、lint/typecheck/build、真实 HTTP 200/400 和页面连接状态 |
+| 03 模型服务适配层与密钥安全 | COMPLETED | [Day 03 课件](lessons/day-03-deepseek-provider.md)：Mock/DeepSeek 适配、8/8 测试、lint/typecheck/build、真实短回复 `OK` |
 | 04 第一次非流式 LLM 调用 | NOT_STARTED | - |
 | 05 流式协议入门与 SSE 帧解析 | NOT_STARTED | - |
 | 06 React 流式消费与消息状态管理 | NOT_STARTED | - |
@@ -52,5 +52,6 @@
 ## 当前问题
 
 - 独立 Gemini 原始大纲文件未在仓库找到；现阶段只可对照最终总控中已整合的五部分和明确知识点。详情见 [覆盖矩阵](COVERAGE_MATRIX.md)。
-- 课程顺序从 16 课切为 40 Day 的依据和版本敏感 API 风险见 [决策日志](DECISION_LOG.md)。
+- 课程顺序从 16 课切为 40 Day、Day 03 提前实施和 Day 02 补课的依据及版本敏感 API 风险见 [决策日志](DECISION_LOG.md)。
 - 页面手机宽度视觉检查留给学习者手动验收；未宣称自动视觉测试通过。
+- 当前仅有 Dashboard 对 `/health` 的连接检查；用户聊天接口、模型错误映射和完整请求链路仍属 Day 04 以后。
