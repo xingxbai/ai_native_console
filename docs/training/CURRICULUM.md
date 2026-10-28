@@ -20,7 +20,7 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 06 | React 流式消费与消息状态管理 | 展示增量消息和终态 | 消息状态机、delta 合并、滚动、错误态、Zustand 边界 | 流式对话 UI | 状态/滚动手动验收；lint/typecheck/test/build | 流式 UI 状态设计 | 05 | 45–60 分钟 | COMPLETED |
 | 07 | AbortController 与 Node.js 取消传播 | 从浏览器取消到模型请求 | AbortSignal、断连、监听清理 | 停止生成和服务端取消链路 | 静态检查通过；运行时断连待验收 | 前端 abort 是否保证后端停止 | 05–06 | 60 分钟 | IN_PROGRESS |
-| 08 | Partial JSON 与结构化数据渐进解析 | 区分展示与最终可信对象 | partial output、增量解析、EOF、Schema | 渐进结构化结果 | 1–20 chunk、断流、非法片段、最终校验 | partial 为何不能写入 | 05–07 | 60 分钟 | NOT_STARTED |
+| 08 | Partial JSON 与结构化数据渐进解析 | 区分展示与最终可信对象 | partial output、增量解析、EOF、Schema | 渐进结构化结果 | 1–20 字节拆帧与 Schema 已验；真实模型/浏览器待验 | partial 为何不能写入 | 05–07 | 60 分钟 | IN_PROGRESS |
 | 09 | 流式 Markdown 与 React 性能优化 | 测量并改善渲染稳定性 | 未闭合代码块、批处理、渲染次数、泄漏 | Markdown 降级渲染、性能记录 | 高频 delta、长文本、未闭合语法 | 如何证明性能优化 | 06–08 | 45–60 分钟 | NOT_STARTED |
 | 10 | Generative UI 安全组件注册表 | 只渲染白名单组件 | UI Schema、ECharts/表格/KPI、骨架、布局 | 受控卡片注册表 | 未知组件、无效 props、空数据、布局 | 为什么不执行模型 HTML/JSX | 08–09 | 60 分钟 | NOT_STARTED |
 
@@ -86,7 +86,7 @@
 
 ## 排程检查
 
-- 8 周各 5 Day，共 **40 Day**；Day 01–06 已完成，Day 07 代码和静态检查已完成但运行时断连待验收，Day 08–40 仍仅有计划。
+- 8 周各 5 Day，共 **40 Day**；Day 01–06 已完成，Day 07 运行时断连待验收，Day 08 代码与协议操作已验但真实结构化生成待验，Day 09–40 仍仅有计划。
 - 每个 Day 开始前读取本表、[进度](PROGRESS.md)、[覆盖矩阵](COVERAGE_MATRIX.md)和前一日验收；完成后记录真实测试。
 - 依赖顺序：Web/API → provider/流式 → 工具/上下文/安全 → LangGraph/HITL → 工作流 → 数据/RAG/评测 → 生产化与面试。版本敏感 API 到相应 Day 才核对并安装。
 - 与本表冲突的新想法先写入 [决策日志](DECISION_LOG.md)；课程顺序或技术栈只在用户同意后调整。

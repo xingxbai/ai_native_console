@@ -13,6 +13,7 @@ import {
 import { ModelOutputLimitError, ModelTimeoutError, type ModelProvider } from "./model-provider.js";
 
 const SYSTEM_INSTRUCTIONS = "Answer in the user's language, briefly and directly. Use at most three short paragraphs or bullets. Do not claim access to business data or tools.";
+const ANALYSIS_INSTRUCTIONS = "Analyze the user's engineering question in their language. Give a concise summary, one concrete risk, and one actionable next step. Do not claim access to business data or tools.";
 
 class ApiError extends Error {
   constructor(readonly code: ApiErrorCode, readonly statusCode: number, message: string) {
@@ -78,6 +79,7 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
 
     const requestId = request.id;
     const message = input.data.message;
+    const format = input.data.format ?? "text";
     const provider = modelProvider;
     const controller = new AbortController();
     const onClose = () => {
@@ -90,13 +92,19 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
       let sequence = 0;
       const frame = (event: StreamEvent) => sseFrame(`${requestId}:${++sequence}`, event);
       yield ": connected\n\n";
-      yield frame({ type: "start", requestId, provider: "deepseek", model: provider.model });
+      yield frame({ type: "start", requestId, provider: "deepseek", model: provider.model, format });
       try {
-        for await (const text of provider.streamReply(SYSTEM_INSTRUCTIONS, message, controller.signal)) {
-          yield frame({ type: "delta", text });
+        if (format === "analysis") {
+          for await (const event of provider.streamAnalysis(ANALYSIS_INSTRUCTIONS, message, controller.signal)) {
+            if (event.type === "partial") yield frame({ type: "partial", value: event.value });
+            else yield frame({ type: "analysis_done", value: event.value, requestId });
+          }
+        } else {
+          for await (const text of provider.streamReply(SYSTEM_INSTRUCTIONS, message, controller.signal)) {
+            yield frame({ type: "delta", text });
+          }
+          if (!controller.signal.aborted) yield frame({ type: "done", requestId });
         }
-        if (controller.signal.aborted) return;
-        yield frame({ type: "done", requestId });
       } catch (error) {
         if (controller.signal.aborted) return;
         const code = error instanceof ModelTimeoutError ? "MODEL_TIMEOUT"

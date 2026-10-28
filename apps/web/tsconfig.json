@@ -23,6 +23,7 @@
       }
     ],
     "paths": {
+      "@ai-native-console/contracts": ["../../packages/contracts/src/index.ts"],
       "@/*": [
         "./*"
       ]

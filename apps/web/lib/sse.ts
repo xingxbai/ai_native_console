@@ -1,4 +1,4 @@
-import { streamEventSchema, type StreamEvent } from "@ai-native-console/contracts";
+import { streamEventSchema, type Analysis, type StreamEvent } from "@ai-native-console/contracts";
 
 type Frame = { event: string; id: string; data: string };
 
@@ -67,7 +67,12 @@ export class StreamReplyError extends Error {
   }
 }
 
-export async function readStreamReply(response: Response, onDelta: (content: string) => void) {
+export async function readStreamReply(
+  response: Response,
+  format: "text" | "analysis",
+  onDelta: (content: string) => void,
+  onPartial: (value: Partial<Analysis>) => void,
+) {
   if (!response.body || !response.headers.get("content-type")?.startsWith("text/event-stream")) {
     throw new Error("Invalid stream response");
   }
@@ -77,6 +82,7 @@ export async function readStreamReply(response: Response, onDelta: (content: str
   let start: Extract<StreamEvent, { type: "start" }> | undefined;
   let completed = false;
   let content = "";
+  let analysis: Analysis | undefined;
   let sequence = 0;
 
   try {
@@ -89,28 +95,37 @@ export async function readStreamReply(response: Response, onDelta: (content: str
           throw new Error("Invalid SSE event order");
         }
         if (event.type === "start") {
-          if (start || event.requestId !== requestId) {
+          if (start || event.requestId !== requestId || event.format !== format) {
             throw new Error("Invalid SSE start event");
           }
           start = event;
         } else if (!start || completed) {
           throw new Error("Unexpected SSE event");
         } else if (event.type === "delta") {
+          if (format !== "text") throw new Error("Unexpected text event");
           content += event.text;
           if (content.length > 4_000) throw new Error("Stream reply is too long");
           onDelta(content);
+        } else if (event.type === "partial") {
+          if (format !== "analysis") throw new Error("Unexpected partial event");
+          // 不完整字段只传给预览，不能作为最终可信对象。
+          onPartial(event.value);
+        } else if (event.type === "analysis_done") {
+          if (format !== "analysis" || event.requestId !== requestId) throw new Error("Invalid analysis completion");
+          analysis = event.value;
+          completed = true;
         } else if (event.type === "error") {
           if (event.requestId !== requestId) throw new Error("Invalid SSE error event");
           throw new StreamReplyError(event.code, event.message);
         } else {
-          if (event.requestId !== requestId || !content.trim()) throw new Error("Invalid SSE completion");
+          if (format !== "text" || event.requestId !== requestId || !content.trim()) throw new Error("Invalid SSE completion");
           completed = true;
         }
       }
     }
     parser.finish();
     if (!completed || !start) throw new Error("Stream ended before completion");
-    return { content, requestId: start.requestId, model: start.model };
+    return { content, analysis, requestId: start.requestId, model: start.model };
   } finally {
     if (!completed) await reader.cancel().catch(() => {});
     reader.releaseLock();

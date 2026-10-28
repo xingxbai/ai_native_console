@@ -83,6 +83,10 @@
 
 完整回答与追问见 [Day 07 课件](lessons/day-07-cancellation.md)：1. 前端 AbortController 能否保证模型停止？2. 为什么正常 `close` 不能当成取消？3. 主动取消、超时和异常 EOF 如何区分？代码与静态检查已完成，运行时断连待验收。
 
+## Day 08：Partial JSON
+
+完整回答与追问见 [Day 08 课件](lessons/day-08-partial-json.md)：1. 为什么不能对每个 chunk 直接 `JSON.parse`？2. 部分对象为何不能写入业务系统？3. HTTP 200 后缺少 `analysis_done` 如何处理？Schema 与拆帧已操作验收，真实 DeepSeek 结构化生成待验。
+
 ## 历史 L00
 
 旧 16 课体系的三道骨架题仍见 [L00 历史课件](lessons/L00-repository-bootstrap.md)。Day 01 采用了独立复测和更完整的面试追问结构；今后按 Day 编号更新此题库。

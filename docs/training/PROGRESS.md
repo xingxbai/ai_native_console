@@ -1,6 +1,6 @@
 # 学习进度
 
-更新日期：2026-10-28。**Day 01–06 已完成；Day 07 进行中，运行时断连待验收。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
+更新日期：2026-10-28。**Day 01–06 已完成；Day 07–08 进行中，运行时验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
 
 当前练习主线：主页输入面试题或真实工程情境，DeepSeek 仅提供流式回复。情境题只用于讨论方案，当前没有订单数据、文档检索、业务工具或审批执行。[README](../../README.md)说明现行操作，[面试题库](interview-question-bank.md)区分已实现与待实现。
 
@@ -13,7 +13,7 @@
 | 05 流式协议入门与 SSE 帧解析 | COMPLETED | [Day 05 课件](lessons/day-05-sse-streaming.md)：真实 DeepSeek SSE、同源透传、1–20 字节拆分、慢读、异常 EOF、400；lint/typecheck、现有 21/21 测试、build 通过。 |
 | 06 React 流式消费与消息状态管理 | COMPLETED | [Day 06 课件](lessons/day-06-react-stream-state.md)：提问记录、增量终态、近底部跟随；lint/typecheck、已有 21/21 测试、build 通过；浏览器交互待手动验收。 |
 | 07 AbortController 与 Node.js 取消传播 | IN_PROGRESS | [Day 07 课件](lessons/day-07-cancellation.md)：停止按钮与前端、代理、Fastify、模型信号链路；静态检查及已有测试通过，按用户要求未启动项目或运行 build，真实断连待验收。 |
-| 08 Partial JSON 与结构化数据渐进解析 | NOT_STARTED | - |
+| 08 Partial JSON 与结构化数据渐进解析 | IN_PROGRESS | [Day 08 课件](lessons/day-08-partial-json.md)：DeepSeek 结构化部分对象预览与完整对象校验；Schema 和 1–20 字节 SSE 拆分已操作验收，真实模型与浏览器待验。 |
 | 09 流式 Markdown 与 React 性能优化 | NOT_STARTED | - |
 | 10 Generative UI 安全组件注册表 | NOT_STARTED | - |
 | 11 Function/Tool Calling 运行机制 | NOT_STARTED | - |
@@ -52,6 +52,8 @@
 - 原 L00 已在前一轮完成，证据位于 [L00 历史课件](lessons/L00-repository-bootstrap.md)。本轮 Day 01 复用代码，重新运行验收并形成独立课件。
 
 ## 当前问题
+
+- Day 08 本轮 `pnpm lint`、`pnpm -r typecheck`、`pnpm -r test`（API 15/15、Web 6/6）和 `git diff --check` 均 exit 0；Schema 与结构化 SSE 1–20 字节拆分操作通过。未启动项目或运行 build，工作区旧契约 `dist` 未刷新；真实 DeepSeek 的 `Output.object()` 兼容性、渐进展示和异常断流仍待运行时验证，见 [Day 08 课件](lessons/day-08-partial-json.md)。
 
 - Day 07 本轮实际执行 `pnpm lint`、`pnpm -r typecheck`、`pnpm -r test` 和 `git diff --check`，均 exit 0；已有 API 15/15、Web 6/6 测试不覆盖取消传播。未启动项目、未运行 build，也未实际验证浏览器断开后 Fastify 和 DeepSeek 是否停止；详见 [Day 07 课件](lessons/day-07-cancellation.md)。
 

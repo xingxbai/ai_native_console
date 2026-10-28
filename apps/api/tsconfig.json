@@ -8,6 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "types": ["node", "vitest/globals"],
+    "paths": { "@ai-native-console/contracts": ["../../packages/contracts/src/index.ts"] },
     "noEmit": true
   },
   "include": ["src/**/*.ts"]

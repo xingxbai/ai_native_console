@@ -2,7 +2,7 @@
 
 核对日期：2026-10-28。来源：根目录最终课程总控的第 1–8 节及其 **3.1「Gemini 五部分课程」整合表**，以及根目录 40-Day 第一条指令的 C、D、E 节。仓库没有独立的 Gemini 原始大纲文件；因此这里能逐项核对的是**总控已整合并明示的 Gemini 内容**，不能声称与未提供的独立原文逐字对照。这一来源缺口记录于 [决策日志](DECISION_LOG.md)。
 
-状态只表示**排程覆盖**：`已安排` = 在 40 Day 中有具体实践与验收计划；`需补强` = 课程有位置，但正式实施前必须核对 API 或补证据；`未安排` = 暂无 Day。**已安排不等于已实现。** Day 01–06 有独立课件与实际验收；Day 06 的 UI 状态证据见[课件](lessons/day-06-react-stream-state.md)，浏览器交互待手动验收。用户取消 Mock 模型逻辑的例外见[决策日志](DECISION_LOG.md)。其余行仍是计划。
+状态只表示**排程覆盖**：`已安排` = 在 40 Day 中有具体实践与验收计划；`需补强` = 课程有位置，但正式实施前必须核对 API 或补证据；`未安排` = 暂无 Day。**已安排不等于已实现。** Day 01–06 有独立课件；Day 07–08 的运行时验收待完成，见各课件。用户取消 Mock 模型逻辑的例外见[决策日志](DECISION_LOG.md)。其余行仍是计划。
 
 当前首页的六道选题只是把 I02/I03/I07/I08/I10/I13/I14/I17/I18 等已排程题目与真实工程情境带入问答练习，不改变对应 Day 的实现状态；情境中的订单、文档检索、审批和 429 治理仍未实现。
 
@@ -50,16 +50,16 @@
 | --- | --- | --- | --- | --- |
 | K01 | HTTP Request/Response、响应体 streaming、SSE、WebSocket 区别 | 05 | 真实 POST SSE 与协议对照，见 Day 05 | 已安排；05 已验收 |
 | K02 | SSE `data/event/id`、UTF-8、空行分帧、注释心跳 | 05 | 解析器、真实流 1–20 字节拆分、CRLF 与初始注释；未做周期心跳 | 已安排；05 已验收初始注释 |
-| K03 | 网络 chunk 不能等同 SSE 帧/token/JSON | 05、08 | 真实流按每块 1–20 字节重放，结果一致；部分业务 JSON 留 08 | 已安排；05 已验收协议层 |
+| K03 | 网络 chunk 不能等同 SSE 帧/token/JSON | 05、08 | 05 真实流拆分；08 结构化事件按 1–20 字节拆分 20/20 | 已安排；08 协议操作已验 |
 | K04 | 代理缓冲、压缩、空闲超时、慢客户端 | 05、30 | 本机同源 `curl -N` 多 delta、300 B/s 慢读；跨环境代理仍待 30 | 已安排；05 本机验收 |
 | K05 | 原生 EventSource GET 与 POST fetch/SDK transport | 05 | 当前 POST fetch 带 JSON body；EventSource 重连未实现，见 Day 05 | 已安排；05 已解释 |
 | K06 | AI SDK 响应 headers、UI Message Stream/纯文本协议匹配 | 05–06 | 核对 `ai@7.0.154` 的 `textStream`，自定义 SSE 由双方共享契约；UI Message Stream 留 06 | 需补强：06 的状态管理/transport |
 | K07 | 旧 `pipeDataStreamToResponse` 不直接照搬 | 05 | 已核对安装版本类型与 Fastify/Next stream API，未用旧 helper | 已安排；05 已验收 |
-| K08 | Streaming Partial JSON 与普通完整 JSON 区别 | 08 | partial 只展示，最终结果校验 | 已安排 |
-| K09 | `@streamparser/json` 与 SDK partial output、`parsePartialJson` 适用区别 | 08 | 比较原始 JSON 增量解析与 SDK 结构化流；异常 EOF | 需补强：库/API 版本未安装 |
-| K10 | `Output.object`、`partialOutputStream`、`useObject` 版本核验 | 08 | 官方文档+类型定义+编译结果 | 需补强：库/API 版本未安装 |
+| K08 | Streaming Partial JSON 与普通完整 JSON 区别 | 08 | partial Schema 通过而完整 Schema 拒绝；未闭合 JSON.parse 失败；真实模型待验 | 已安排；08 操作已验 |
+| K09 | `@streamparser/json` 与 SDK partial output、`parsePartialJson` 适用区别 | 08 | 选用已安装 SDK 的 partialOutputStream；原始 JSON 增量解析库未引入，适用边界见 Day 08 | 需补强：真实模型/异常 EOF 待验 |
+| K10 | `Output.object`、`partialOutputStream`、`useObject` 版本核验 | 08 | 核对已安装 ai@7 类型与示例，Output.object/partialOutputStream 类型检查通过；未使用 useObject | 需补强：真实 DeepSeek 兼容性待验 |
 | K11 | 工具输入增量与结构化输出 partial stream 不混用 | 08、11 | 分离两种事件与 UI 状态测试 | 已安排 |
-| K12 | 禁止正则补全任意 JSON | 08 | 增量解析器与 EOF/坏片段测试 | 已安排 |
+| K12 | 禁止正则补全任意 JSON | 08 | 使用 SDK partialOutputStream 与最终 Zod；未用正则补全；异常 EOF 待运行验收 | 已安排；08 部分已验 |
 | K13 | Generative UI 组件白名单与 props Schema | 10 | 未知组件/非法属性拒绝，不执行 HTML/JSX | 已安排 |
 | K14 | 卡片骨架、图表固定尺寸、布局稳定 | 10、39 | 空数据/长标签/增量数据视觉测试 | 已安排 |
 | K15 | 高频 delta 全量重渲染与批处理取舍 | 09 | render count/Profiler，验证不丢字 | 已安排 |

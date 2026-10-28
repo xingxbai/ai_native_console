@@ -1,6 +1,6 @@
 # AI Native Console
 
-面向 AI Agent 工程面试与实际开发情境的个人学习项目。Day 01–06 已完成，Day 07 取消链路待运行时验收。首页输入面试题或场景题，由 DeepSeek 流式回答。模型不读取仓库或业务数据；工具调用、Agent 工作流和审批均未实现。
+面向 AI Agent 工程面试与实际开发情境的个人学习项目。Day 01–06 已完成，Day 07–08 的新增链路待运行时验收。首页输入面试题或场景题，由 DeepSeek 流式回答。模型不读取仓库或业务数据；工具调用、Agent 工作流和审批均未实现。
 
 ## 运行
 
@@ -32,6 +32,8 @@ pnpm dev
 ```
 
 Web 使用 Next.js App Router、React、TypeScript、Tailwind CSS；API 使用 Node.js、TypeScript、Fastify；`packages/contracts` 提供共享 Zod 契约。`POST /api/v1/chat/stream` 接受最多 500 字的 `message`，返回带 `start/delta/done/error` 的 SSE；Next 同源 `/api/chat/stream` 透传，页面按事件递增展示。当前关闭 DeepSeek 思考模式，模型输出上限为 1024 token，禁用 SDK 自动重试；达到上限的截断答复会被拒绝。流式 `id` 只表示本次请求的事件顺序，尚不支持断线重放。当前仅适合可信本地环境：没有登录、限流、成本总预算或跨用户隔离。
+
+选择“结构化分析”时，同一接口增加 `format=analysis`，用 `partial` 事件预览摘要、风险和下一步；最终对象通过 Schema 后才发送 `analysis_done`。真实 DeepSeek 的结构化输出与浏览器效果尚未运行验证，见 [Day 08 课件](docs/training/lessons/day-08-partial-json.md)。
 
 ## 验证
 
