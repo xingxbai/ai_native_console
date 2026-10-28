@@ -1,8 +1,8 @@
 # 课程知识点与实践覆盖矩阵
 
-核对日期：2026-10-27。来源：根目录最终课程总控的第 1–8 节及其 **3.1「Gemini 五部分课程」整合表**，以及根目录 40-Day 第一条指令的 C、D、E 节。仓库没有独立的 Gemini 原始大纲文件；因此这里能逐项核对的是**总控已整合并明示的 Gemini 内容**，不能声称与未提供的独立原文逐字对照。这一来源缺口记录于 [决策日志](DECISION_LOG.md)。
+核对日期：2026-10-28。来源：根目录最终课程总控的第 1–8 节及其 **3.1「Gemini 五部分课程」整合表**，以及根目录 40-Day 第一条指令的 C、D、E 节。仓库没有独立的 Gemini 原始大纲文件；因此这里能逐项核对的是**总控已整合并明示的 Gemini 内容**，不能声称与未提供的独立原文逐字对照。这一来源缺口记录于 [决策日志](DECISION_LOG.md)。
 
-状态只表示**排程覆盖**：`已安排` = 在 40 Day 中有具体实践与验收计划；`需补强` = 课程有位置，但正式实施前必须核对 API 或补证据；`未安排` = 暂无 Day。**已安排不等于已实现。** Day 01–04 有独立课件与实际验收；Day 04 的当前 DeepSeek-only 证据见[评测样例](../evals/day-04-smoke.md)。用户取消 Mock 模型逻辑的例外见[决策日志](DECISION_LOG.md)。其余行仍是计划。
+状态只表示**排程覆盖**：`已安排` = 在 40 Day 中有具体实践与验收计划；`需补强` = 课程有位置，但正式实施前必须核对 API 或补证据；`未安排` = 暂无 Day。**已安排不等于已实现。** Day 01–05 有独立课件与实际验收；Day 05 的 SSE 证据见[课件](lessons/day-05-sse-streaming.md)。用户取消 Mock 模型逻辑的例外见[决策日志](DECISION_LOG.md)。其余行仍是计划。
 
 当前首页的六道选题只是把 I02/I03/I07/I08/I10/I13/I14/I17/I18 等已排程题目与真实工程情境带入问答练习，不改变对应 Day 的实现状态；情境中的订单、文档检索、审批和 429 治理仍未实现。
 
@@ -48,13 +48,13 @@
 
 | ID | 知识点（逐项检查） | Day | 代码实践与失败验收 | 状态 |
 | --- | --- | --- | --- | --- |
-| K01 | HTTP Request/Response、响应体 streaming、SSE、WebSocket 区别 | 05 | 协议对照与最小流；解释适用场景 | 已安排 |
-| K02 | SSE `data/event/id`、UTF-8、空行分帧、注释心跳 | 05 | 帧解析器；拆帧/合帧/心跳测试 | 已安排 |
-| K03 | 网络 chunk 不能等同 SSE 帧/token/JSON | 05、08 | 随机 chunk 切分 1–20 段 | 已安排 |
-| K04 | 代理缓冲、压缩、空闲超时、慢客户端 | 05、30 | 缓冲/慢读/超时故障演练 | 已安排 |
-| K05 | 原生 EventSource GET 与 POST fetch/SDK transport | 05 | 文档化请求体、鉴权、重连差异 | 已安排 |
-| K06 | AI SDK 响应 headers、UI Message Stream/纯文本协议匹配 | 05–06 | 锁定版本后检查前后端协议帧 | 需补强：届时核对 API |
-| K07 | 旧 `pipeDataStreamToResponse` 不直接照搬 | 05 | 安装版本与官方流 API 对照记录 | 需补强：届时核对 API |
+| K01 | HTTP Request/Response、响应体 streaming、SSE、WebSocket 区别 | 05 | 真实 POST SSE 与协议对照，见 Day 05 | 已安排；05 已验收 |
+| K02 | SSE `data/event/id`、UTF-8、空行分帧、注释心跳 | 05 | 解析器、真实流 1–20 字节拆分、CRLF 与初始注释；未做周期心跳 | 已安排；05 已验收初始注释 |
+| K03 | 网络 chunk 不能等同 SSE 帧/token/JSON | 05、08 | 真实流按每块 1–20 字节重放，结果一致；部分业务 JSON 留 08 | 已安排；05 已验收协议层 |
+| K04 | 代理缓冲、压缩、空闲超时、慢客户端 | 05、30 | 本机同源 `curl -N` 多 delta、300 B/s 慢读；跨环境代理仍待 30 | 已安排；05 本机验收 |
+| K05 | 原生 EventSource GET 与 POST fetch/SDK transport | 05 | 当前 POST fetch 带 JSON body；EventSource 重连未实现，见 Day 05 | 已安排；05 已解释 |
+| K06 | AI SDK 响应 headers、UI Message Stream/纯文本协议匹配 | 05–06 | 核对 `ai@7.0.154` 的 `textStream`，自定义 SSE 由双方共享契约；UI Message Stream 留 06 | 需补强：06 的状态管理/transport |
+| K07 | 旧 `pipeDataStreamToResponse` 不直接照搬 | 05 | 已核对安装版本类型与 Fastify/Next stream API，未用旧 helper | 已安排；05 已验收 |
 | K08 | Streaming Partial JSON 与普通完整 JSON 区别 | 08 | partial 只展示，最终结果校验 | 已安排 |
 | K09 | `@streamparser/json` 与 SDK partial output、`parsePartialJson` 适用区别 | 08 | 比较原始 JSON 增量解析与 SDK 结构化流；异常 EOF | 需补强：库/API 版本未安装 |
 | K10 | `Output.object`、`partialOutputStream`、`useObject` 版本核验 | 08 | 官方文档+类型定义+编译结果 | 需补强：库/API 版本未安装 |
@@ -117,7 +117,7 @@
 | --- | --- | --- | --- | --- |
 | C01 | 无密钥启动双端、静态 Dashboard、`GET /health` | 01 | 锁文件安装、lint/typecheck、3/3 test、build、HTTP 200/404，详见 Day 01 课件 | 已安排；01 已验收 |
 | C02 | DeepSeek provider 与非流式调用 | 03–04 | 服务端密钥校验、问答 API、同源页面入口、DeepSeek 真实请求、故障注入与最小评测 | 已安排；03–04 已验收，Mock 已撤除 |
-| C03 | SSE 解析、前后端流式联通、取消传播 | 05–07 | 拆帧、断连、慢客户端、signal | 已安排 |
+| C03 | SSE 解析、前后端流式联通、取消传播 | 05–07 | 05 已完成解析、真实联通与慢读；浏览器到模型的取消传播留 07 | 已安排；05 部分已验收 |
 | C04 | Partial structured UI 与渲染稳定性 | 08–10 | 随机 chunk、EOF、渲染次数、布局 | 已安排 |
 | C05 | 三个只读业务工具与有界 Agent Loop | 11–15、31 | 工具名/参数/权限/超时/重试 | 已安排 |
 | C06 | 白名单 Context、摘要与注入防护 | 16–20 | 长会话、切换用户、恶意内容 | 已安排 |

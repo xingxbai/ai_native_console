@@ -1,12 +1,15 @@
 import Fastify from "fastify";
 import { randomUUID } from "node:crypto";
+import { Readable } from "node:stream";
 import {
   apiErrorResponseSchema,
   chatRequestSchema,
   chatResponseSchema,
   healthQuerySchema,
   healthResponseSchema,
+  streamEventSchema,
   type ApiErrorCode,
+  type StreamEvent,
 } from "@ai-native-console/contracts";
 import { ModelOutputLimitError, ModelTimeoutError, type ModelProvider } from "./model-provider.js";
 
@@ -17,6 +20,10 @@ class ApiError extends Error {
     super(message);
     this.name = "ApiError";
   }
+}
+
+function sseFrame(id: string, event: StreamEvent): string {
+  return `id: ${id}\nevent: ${event.type}\ndata: ${JSON.stringify(streamEventSchema.parse(event))}\n\n`;
 }
 
 export function createApp(options: { logger?: boolean; modelProvider?: ModelProvider } = {}) {
@@ -98,6 +105,40 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
       model: modelProvider.model,
       requestId: request.id,
     });
+  });
+
+  app.post("/api/v1/chat/stream", async (request, reply) => {
+    const input = chatRequestSchema.safeParse(request.body);
+    if (!input.success) throw new ApiError("VALIDATION_ERROR", 400, "Invalid chat request");
+    if (!modelProvider) throw new ApiError("MODEL_UNAVAILABLE", 503, "DeepSeek is not configured");
+
+    const requestId = request.id;
+    const message = input.data.message;
+    const provider = modelProvider;
+    async function* events() {
+      let sequence = 0;
+      const frame = (event: StreamEvent) => sseFrame(`${requestId}:${++sequence}`, event);
+      yield ": connected\n\n";
+      yield frame({ type: "start", requestId, provider: "deepseek", model: provider.model });
+      try {
+        for await (const text of provider.streamReply(SYSTEM_INSTRUCTIONS, message)) {
+          yield frame({ type: "delta", text });
+        }
+        yield frame({ type: "done", requestId });
+      } catch (error) {
+        const code = error instanceof ModelTimeoutError ? "MODEL_TIMEOUT"
+          : error instanceof ModelOutputLimitError ? "MODEL_INVALID_RESPONSE" : "MODEL_UNAVAILABLE";
+        request.log.warn({ requestId, errorName: error instanceof Error ? error.name : "UnknownError" }, "model stream failed");
+        yield frame({ type: "error", code, message: "Model stream failed", requestId });
+      }
+    }
+
+    reply.headers({
+      "content-type": "text/event-stream; charset=utf-8",
+      "cache-control": "no-cache, no-transform",
+      "x-accel-buffering": "no",
+    });
+    return reply.send(Readable.from(events()));
   });
 
   return app;

@@ -12,7 +12,7 @@
 | 02 | 开发环境、API 契约与错误边界 | 建立可验证接口约定 | 环境配置、运行时校验、错误体、requestId | 配置模块、共享 API 契约 | 缺配置、无效输入、错误码和 ID | 类型与运行时校验区别 | 01 | 45–60 分钟 | COMPLETED |
 | 03 | 模型服务适配层与密钥安全 | DeepSeek Key 仅服务端 | DeepSeek、Vercel AI SDK/provider adapter、模型配置 | DeepSeek provider 接口 | 缺 Key、非法模型、真实连通性 | provider 隔离与密钥安全 | 02（曾先行实施，现已补齐） | 45–60 分钟 | COMPLETED |
 | 04 | 第一次非流式 LLM 调用 | 解释最小模型请求 | system/user/assistant、超时、输出限制 | 非流式问答 API、评测样例 | DeepSeek 成功、超时、模型不可用 | 模型回答不是业务事实 | 03 | 45–60 分钟 | COMPLETED |
-| 05 | 流式协议入门与 SSE 帧解析 | 区分 chunk 与事件 | HTTP 响应流、SSE、WebSocket、UTF-8、心跳、AI SDK 协议 | 明确协议的前后端流 | 拆帧/合帧、慢读、异常结束 | SSE/WebSocket、EventSource/POST fetch | 04 | 60 分钟 | NOT_STARTED |
+| 05 | 流式协议入门与 SSE 帧解析 | 区分 chunk 与事件 | HTTP 响应流、SSE、WebSocket、UTF-8、心跳、AI SDK 协议 | 真实 DeepSeek 流、同源代理、SSE 解析与展示 | 拆帧/合帧、慢读、异常结束 | SSE/WebSocket、EventSource/POST fetch | 04 | 60 分钟 | COMPLETED |
 
 ## Week 2：Streaming、Partial JSON 与 Generative UI
 
@@ -86,7 +86,7 @@
 
 ## 排程检查
 
-- 8 周各 5 Day，共 **40 Day**；Day 01–04 有课件、代码和验收记录，Day 05–40 仍仅有计划。
+- 8 周各 5 Day，共 **40 Day**；Day 01–05 有课件、代码和验收记录，Day 06–40 仍仅有计划。
 - 每个 Day 开始前读取本表、[进度](PROGRESS.md)、[覆盖矩阵](COVERAGE_MATRIX.md)和前一日验收；完成后记录真实测试。
 - 依赖顺序：Web/API → provider/流式 → 工具/上下文/安全 → LangGraph/HITL → 工作流 → 数据/RAG/评测 → 生产化与面试。版本敏感 API 到相应 Day 才核对并安装。
 - 与本表冲突的新想法先写入 [决策日志](DECISION_LOG.md)；课程顺序或技术栈只在用户同意后调整。

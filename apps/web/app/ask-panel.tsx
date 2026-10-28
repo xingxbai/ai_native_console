@@ -2,11 +2,14 @@
 
 import { useState, type FormEvent } from "react";
 import { apiErrorResponseSchema, chatResponseSchema, type ChatResponse } from "@ai-native-console/contracts";
+import { readStreamReply, StreamReplyError } from "../lib/sse";
 
 type Result =
   | { status: "idle" | "loading" }
+  | { status: "streaming"; content: string }
   | { status: "success"; data: ChatResponse }
   | { status: "error"; message: string; requestId?: string };
+type Mode = "complete" | "stream";
 
 const errorMessages: Record<string, string> = {
   BAD_REQUEST: "请求格式不正确，请重试。",
@@ -29,22 +32,24 @@ const practicePrompts = [
 
 export function AskPanel() {
   const [message, setMessage] = useState("");
+  const [mode, setMode] = useState<Mode>("complete");
   const [result, setResult] = useState<Result>({ status: "idle" });
+  const busy = result.status === "loading" || result.status === "streaming";
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const input = message.trim();
-    if (!input || input.length > 500 || result.status === "loading") return;
+    if (!input || input.length > 500 || busy) return;
 
     setResult({ status: "loading" });
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch(mode === "stream" ? "/api/chat/stream" : "/api/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ message: input }),
       });
-      const body: unknown = await response.json();
       if (!response.ok) {
+        const body: unknown = await response.json();
         const apiError = apiErrorResponseSchema.safeParse(body);
         setResult({
           status: "error",
@@ -54,25 +59,54 @@ export function AskPanel() {
         return;
       }
 
+      if (mode === "stream") {
+        const reply = await readStreamReply(response, (content) => setResult({ status: "streaming", content }));
+        setResult({ status: "success", data: chatResponseSchema.parse({
+          reply: { role: "assistant", content: reply.content },
+          provider: "deepseek",
+          model: reply.model,
+          requestId: reply.requestId,
+        }) });
+        return;
+      }
+
+      const body: unknown = await response.json();
       const parsed = chatResponseSchema.safeParse(body);
       setResult(parsed.success
         ? { status: "success", data: parsed.data }
         : { status: "error", message: "回复格式异常，请稍后重试。" });
-    } catch {
-      setResult({ status: "error", message: "连接失败，请稍后重试。" });
+    } catch (error) {
+      setResult({
+        status: "error",
+        message: error instanceof StreamReplyError
+          ? errorMessages[error.code] ?? "流式回复未完成，请重试。"
+          : "回复中断或格式异常，请重试。",
+      });
     }
   }
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_19rem]">
       <div className="min-w-0">
+      <div aria-label="回复模式" className="mb-5 inline-flex rounded-md border border-[#bdcbd0] bg-white p-0.5">
+        {([{"value":"complete","label":"完整回复"},{"value":"stream","label":"流式回复"}] as const).map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            aria-pressed={mode === option.value}
+            disabled={busy}
+            onClick={() => { setMode(option.value); setResult({ status: "idle" }); }}
+            className={`min-w-24 rounded px-3 py-1.5 text-sm disabled:cursor-not-allowed ${mode === option.value ? "bg-[#173c42] text-white" : "text-[#52646b] hover:text-[#173c42]"}`}
+          >{option.label}</button>
+        ))}
+      </div>
       <form onSubmit={submit} className="space-y-3">
         <label htmlFor="question" className="block text-sm font-medium">问题</label>
         <textarea
           id="question"
           value={message}
           onChange={(event) => setMessage(event.target.value)}
-          disabled={result.status === "loading"}
+          disabled={busy}
           maxLength={500}
           rows={3}
           placeholder="输入面试题或实际工程情境"
@@ -82,15 +116,21 @@ export function AskPanel() {
           <span className="text-xs text-[#65747a]">{message.length}/500 · 每次提问单独计费</span>
           <button
             type="submit"
-            disabled={!message.trim() || result.status === "loading"}
+            disabled={!message.trim() || busy}
             className="min-w-20 rounded-md bg-[#173c42] px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-[#aebbc0]"
           >
-            {result.status === "loading" ? "正在回复" : "提问"}
+            {busy ? "正在回复" : "提问"}
           </button>
         </div>
       </form>
 
       <div aria-live="polite" className="mt-5 min-h-8">
+        {result.status === "streaming" && (
+          <div className="border-t border-[#dbe2e5] pt-4">
+            <p className="text-xs font-medium text-[#527c7e]">DeepSeek 正在回复</p>
+            <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-7">{result.content}</p>
+          </div>
+        )}
         {result.status === "success" && (
           <div className="border-t border-[#dbe2e5] pt-4">
             <p className="text-xs font-medium text-[#527c7e]">DeepSeek 回复</p>
@@ -115,7 +155,7 @@ export function AskPanel() {
                 <button
                   key={item.title}
                   type="button"
-                  disabled={result.status === "loading"}
+                  disabled={busy}
                   onClick={() => { setMessage(item.prompt); setResult({ status: "idle" }); }}
                   className="flex min-h-11 w-full items-center justify-between gap-2 py-2 text-left text-sm hover:text-[#207a74] focus-visible:outline-2 focus-visible:outline-[#207a74] disabled:cursor-not-allowed disabled:opacity-50"
                   title={`填入${item.title}练习题`}
