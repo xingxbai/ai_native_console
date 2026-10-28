@@ -4,7 +4,6 @@ import { Readable } from "node:stream";
 import {
   apiErrorResponseSchema,
   chatRequestSchema,
-  chatResponseSchema,
   healthQuerySchema,
   healthResponseSchema,
   streamEventSchema,
@@ -72,41 +71,6 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
     return healthResponseSchema.parse({ status: "ok" });
   });
 
-  app.post("/api/v1/chat", async (request) => {
-    const input = chatRequestSchema.safeParse(request.body);
-    if (!input.success) {
-      throw new ApiError("VALIDATION_ERROR", 400, "Invalid chat request");
-    }
-    if (!modelProvider) {
-      throw new ApiError("MODEL_UNAVAILABLE", 503, "DeepSeek is not configured");
-    }
-
-    let content: string;
-    try {
-      content = await modelProvider.generateReply(SYSTEM_INSTRUCTIONS, input.data.message);
-    } catch (error) {
-      if (error instanceof ModelTimeoutError) {
-        throw new ApiError("MODEL_TIMEOUT", 504, "Model request timed out");
-      }
-      if (error instanceof ModelOutputLimitError) {
-        throw new ApiError("MODEL_INVALID_RESPONSE", 502, "Model output was incomplete");
-      }
-      request.log.warn({ requestId: request.id, errorName: error instanceof Error ? error.name : "UnknownError" }, "model request failed");
-      throw new ApiError("MODEL_UNAVAILABLE", 503, "Model is temporarily unavailable");
-    }
-
-    if (!content.trim() || content.length > 4_000) {
-      throw new ApiError("MODEL_INVALID_RESPONSE", 502, "Model returned invalid text");
-    }
-
-    return chatResponseSchema.parse({
-      reply: { role: "assistant", content: content.trim() },
-      provider: "deepseek",
-      model: modelProvider.model,
-      requestId: request.id,
-    });
-  });
-
   app.post("/api/v1/chat/stream", async (request, reply) => {
     const input = chatRequestSchema.safeParse(request.body);
     if (!input.success) throw new ApiError("VALIDATION_ERROR", 400, "Invalid chat request");
@@ -115,6 +79,7 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
     const requestId = request.id;
     const message = input.data.message;
     const provider = modelProvider;
+    // 流开始后不能再改 HTTP 状态，模型失败通过终止 error 事件通知页面。
     async function* events() {
       let sequence = 0;
       const frame = (event: StreamEvent) => sseFrame(`${requestId}:${++sequence}`, event);

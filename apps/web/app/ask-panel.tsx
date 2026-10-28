@@ -1,15 +1,10 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { apiErrorResponseSchema, chatResponseSchema, type ChatResponse } from "@ai-native-console/contracts";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { apiErrorResponseSchema } from "@ai-native-console/contracts";
 import { readStreamReply, StreamReplyError } from "../lib/sse";
 
-type Result =
-  | { status: "idle" | "loading" }
-  | { status: "streaming"; content: string }
-  | { status: "success"; data: ChatResponse }
-  | { status: "error"; message: string; requestId?: string };
-type Mode = "complete" | "stream";
+type Exchange = { id: number; question: string; status: "loading" | "streaming" | "complete" | "error"; content: string; error?: string; requestId?: string };
 
 const errorMessages: Record<string, string> = {
   BAD_REQUEST: "请求格式不正确，请重试。",
@@ -21,29 +16,35 @@ const errorMessages: Record<string, string> = {
   NOT_FOUND: "问答服务暂时不可用。",
 };
 
-const practicePrompts = [
-  { category: "面试题", title: "Agent 与 Workflow", prompt: "面试题：什么场景用确定性 Workflow 就够了，什么场景才需要 Agent？请给一个工程例子，并说出两者的风险边界。" },
-  { category: "面试题", title: "工具调用边界", prompt: "面试题：Tool Calling 到底是谁执行工具？模型返回合法 JSON 后，服务端还要检查什么？请结合权限和参数校验回答。" },
-  { category: "面试题", title: "取消与超时", prompt: "面试题：浏览器调用 AbortController 后，能否保证 Node 服务端和模型请求已经停止？请说明还需要验证的环节。" },
-  { category: "真实场景", title: "审批流程", prompt: "场景：运营人员想让 AI 批量修改订单状态。请设计执行前的服务端权限、参数校验和人工审批边界；不要假设已有订单数据。" },
-  { category: "真实场景", title: "客服知识检索", prompt: "场景：客服助手需要依据产品文档回答退款规则。没有提供文档时，你会怎样设计检索、引用和拒答，避免编造政策？" },
-  { category: "真实场景", title: "模型故障", prompt: "场景：生产请求遇到模型超时和 429。请给出用户可见状态、重试与成本上限的处理思路；不要假设当前项目已有这些能力。" },
-] as const;
-
 export function AskPanel() {
   const [message, setMessage] = useState("");
-  const [mode, setMode] = useState<Mode>("complete");
-  const [result, setResult] = useState<Result>({ status: "idle" });
-  const busy = result.status === "loading" || result.status === "streaming";
+  const [exchanges, setExchanges] = useState<Exchange[]>([]);
+  const [busy, setBusy] = useState(false);
+  const nextId = useRef(0);
+  const listRef = useRef<HTMLDivElement>(null);
+  const followRef = useRef(true);
+
+  // 用户查看旧记录时暂停自动跟随，新问题提交后恢复跟随。
+  useEffect(() => {
+    if (followRef.current) listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
+  }, [exchanges]);
+
+  function updateExchange(id: number, patch: Partial<Exchange>) {
+    setExchanges((items) => items.map((item) => item.id === id ? { ...item, ...patch } : item));
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const input = message.trim();
     if (!input || input.length > 500 || busy) return;
 
-    setResult({ status: "loading" });
+    const id = ++nextId.current;
+    followRef.current = true;
+    setBusy(true);
+    setMessage("");
+    setExchanges((items) => [...items, { id, question: input, status: "loading", content: "" }]);
     try {
-      const response = await fetch(mode === "stream" ? "/api/chat/stream" : "/api/chat", {
+      const response = await fetch("/api/chat/stream", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ message: input }),
@@ -51,55 +52,32 @@ export function AskPanel() {
       if (!response.ok) {
         const body: unknown = await response.json();
         const apiError = apiErrorResponseSchema.safeParse(body);
-        setResult({
+        updateExchange(id, {
           status: "error",
-          message: apiError.success ? errorMessages[apiError.data.error.code] : "服务暂时不可用，请稍后重试。",
+          error: apiError.success ? errorMessages[apiError.data.error.code] : "服务暂时不可用，请稍后重试。",
           requestId: apiError.success ? apiError.data.error.requestId : undefined,
         });
         return;
       }
 
-      if (mode === "stream") {
-        const reply = await readStreamReply(response, (content) => setResult({ status: "streaming", content }));
-        setResult({ status: "success", data: chatResponseSchema.parse({
-          reply: { role: "assistant", content: reply.content },
-          provider: "deepseek",
-          model: reply.model,
-          requestId: reply.requestId,
-        }) });
-        return;
-      }
-
-      const body: unknown = await response.json();
-      const parsed = chatResponseSchema.safeParse(body);
-      setResult(parsed.success
-        ? { status: "success", data: parsed.data }
-        : { status: "error", message: "回复格式异常，请稍后重试。" });
+      // 只有流协议收到 done 后才将这条回复标记为完成。
+      const reply = await readStreamReply(response, (content) => updateExchange(id, { status: "streaming", content }));
+      updateExchange(id, { status: "complete", content: reply.content, requestId: reply.requestId });
     } catch (error) {
-      setResult({
+      updateExchange(id, {
         status: "error",
-        message: error instanceof StreamReplyError
+        error: error instanceof StreamReplyError
           ? errorMessages[error.code] ?? "流式回复未完成，请重试。"
           : "回复中断或格式异常，请重试。",
       });
+    } finally {
+      setBusy(false);
     }
   }
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_19rem]">
       <div className="min-w-0">
-      <div aria-label="回复模式" className="mb-5 inline-flex rounded-md border border-[#bdcbd0] bg-white p-0.5">
-        {([{"value":"complete","label":"完整回复"},{"value":"stream","label":"流式回复"}] as const).map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            aria-pressed={mode === option.value}
-            disabled={busy}
-            onClick={() => { setMode(option.value); setResult({ status: "idle" }); }}
-            className={`min-w-24 rounded px-3 py-1.5 text-sm disabled:cursor-not-allowed ${mode === option.value ? "bg-[#173c42] text-white" : "text-[#52646b] hover:text-[#173c42]"}`}
-          >{option.label}</button>
-        ))}
-      </div>
       <form onSubmit={submit} className="space-y-3">
         <label htmlFor="question" className="block text-sm font-medium">问题</label>
         <textarea
@@ -124,49 +102,22 @@ export function AskPanel() {
         </div>
       </form>
 
-      <div aria-live="polite" className="mt-5 min-h-8">
-        {result.status === "streaming" && (
-          <div className="border-t border-[#dbe2e5] pt-4">
-            <p className="text-xs font-medium text-[#527c7e]">DeepSeek 正在回复</p>
-            <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-7">{result.content}</p>
-          </div>
-        )}
-        {result.status === "success" && (
-          <div className="border-t border-[#dbe2e5] pt-4">
-            <p className="text-xs font-medium text-[#527c7e]">DeepSeek 回复</p>
-            <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-7">{result.data.reply.content}</p>
-            <p className="mt-3 break-all text-xs text-[#65747a]">请求 ID {result.data.requestId}</p>
-          </div>
-        )}
-        {result.status === "error" && (
-          <p className="break-words text-sm text-[#a04237]" role="alert">
-            {result.message}{result.requestId ? ` 请求 ID ${result.requestId}` : ""}
-          </p>
-        )}
-      </div>
-      </div>
-      <aside aria-label="练习题目" className="min-w-0 border-t border-[#dbe2e5] pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-        <h3 className="mb-3 text-sm font-semibold">选题练习</h3>
-        {(["面试题", "真实场景"] as const).map((category) => (
-          <div key={category} className="mb-5">
-            <p className="mb-2 text-xs font-medium text-[#527c7e]">{category}</p>
-            <div className="divide-y divide-[#dbe2e5] border-y border-[#dbe2e5]">
-              {practicePrompts.filter((item) => item.category === category).map((item) => (
-                <button
-                  key={item.title}
-                  type="button"
-                  disabled={busy}
-                  onClick={() => { setMessage(item.prompt); setResult({ status: "idle" }); }}
-                  className="flex min-h-11 w-full items-center justify-between gap-2 py-2 text-left text-sm hover:text-[#207a74] focus-visible:outline-2 focus-visible:outline-[#207a74] disabled:cursor-not-allowed disabled:opacity-50"
-                  title={`填入${item.title}练习题`}
-                >
-                  <span>{item.title}</span><span aria-hidden="true" className="text-[#8b9a9e]">+</span>
-                </button>
-              ))}
-            </div>
+      <div ref={listRef} aria-label="提问记录" onScroll={(event) => {
+        const element = event.currentTarget;
+        followRef.current = element.scrollHeight - element.scrollTop - element.clientHeight < 80;
+      }} className="mt-5 max-h-[32rem] min-h-8 overflow-y-auto" role="log" aria-live="polite">
+        {exchanges.map((item) => (
+          <div key={item.id} className="border-t border-[#dbe2e5] py-4">
+            <p className="text-xs font-medium text-[#65747a]">问题</p>
+            <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">{item.question}</p>
+            <p className="mt-3 text-xs font-medium text-[#527c7e]">DeepSeek · {{ loading: "等待回复", streaming: "正在回复", complete: "已完成", error: "回复失败" }[item.status]}</p>
+            {item.content && <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-7">{item.content}</p>}
+            {item.error && <p className="mt-2 text-sm text-[#a04237]" role="alert">{item.error}</p>}
+            {item.requestId && <p className="mt-3 break-all text-xs text-[#65747a]">请求 ID {item.requestId}</p>}
           </div>
         ))}
-      </aside>
+      </div>
+      </div>
     </div>
   );
 }

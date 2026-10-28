@@ -75,6 +75,10 @@
 
 **证据边界：** 真实 DeepSeek SSE、20 种拆分、慢读和异常 EOF 已操作验收；21/21 个旧测试不覆盖新流。浏览器自动点击、真实供应商中途断流、取消传播和重连未执行。
 
+## Day 06：React 流式消息状态
+
+完整回答与追问见 [Day 06 课件](lessons/day-06-react-stream-state.md)：1. 如何设计 loading/streaming/complete/error 转移？2. 如何让自动滚动不打断阅读？3. 页面历史为何不等于模型记忆，何时才需要 Zustand？
+
 ## 历史 L00
 
 旧 16 课体系的三道骨架题仍见 [L00 历史课件](lessons/L00-repository-bootstrap.md)。Day 01 采用了独立复测和更完整的面试追问结构；今后按 Day 编号更新此题库。

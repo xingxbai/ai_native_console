@@ -1,5 +1,5 @@
 import { createDeepSeek } from "@ai-sdk/deepseek";
-import { generateText, streamText } from "ai";
+import { streamText } from "ai";
 import { z } from "zod";
 
 const promptSchema = z.string().trim().min(1).max(500);
@@ -11,7 +11,6 @@ const configSchema = z.object({
 
 export type ModelProvider = {
   model: string;
-  generateReply(instructions: string, prompt: string): Promise<string>;
   streamReply(instructions: string, prompt: string): AsyncIterable<string>;
 };
 
@@ -46,18 +45,6 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
     };
   }
 
-  async function generateReply(instructions: string, prompt: string) {
-    const abortSignal = AbortSignal.timeout(20_000);
-    try {
-      const result = await generateText(requestOptions(instructions, prompt, abortSignal));
-      if (result.finishReason === "length") throw new ModelOutputLimitError();
-      return result.text;
-    } catch (error) {
-      if (abortSignal.aborted) throw new ModelTimeoutError();
-      throw error;
-    }
-  }
-
   async function* streamReply(instructions: string, prompt: string) {
     const abortSignal = AbortSignal.timeout(20_000);
     try {
@@ -77,7 +64,6 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
 
   return {
     model,
-    generateReply,
     streamReply,
   };
 }

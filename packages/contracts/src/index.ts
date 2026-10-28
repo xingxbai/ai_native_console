@@ -12,16 +12,6 @@ export const chatRequestSchema = z.strictObject({
   message: z.string().trim().min(1).max(500),
 });
 
-export const chatResponseSchema = z.strictObject({
-  reply: z.strictObject({
-    role: z.literal("assistant"),
-    content: z.string().trim().min(1).max(4_000),
-  }),
-  provider: z.literal("deepseek"),
-  model: z.string().min(1),
-  requestId: requestIdSchema,
-});
-
 export const streamEventSchema = z.discriminatedUnion("type", [
   z.strictObject({
     type: z.literal("start"),
@@ -59,7 +49,6 @@ export const apiErrorResponseSchema = z.strictObject({
 
 export type HealthResponse = z.infer<typeof healthResponseSchema>;
 export type ChatRequest = z.infer<typeof chatRequestSchema>;
-export type ChatResponse = z.infer<typeof chatResponseSchema>;
 export type StreamEvent = z.infer<typeof streamEventSchema>;
 export type ApiErrorCode = z.infer<typeof apiErrorCodeSchema>;
 export type ApiErrorResponse = z.infer<typeof apiErrorResponseSchema>;
