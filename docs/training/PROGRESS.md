@@ -1,6 +1,6 @@
 # 学习进度
 
-更新日期：2026-10-28。**Day 01–06 已完成；Day 07 未开始。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
+更新日期：2026-10-28。**Day 01–06 已完成；Day 07 进行中，运行时断连待验收。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
 
 当前练习主线：主页输入面试题或真实工程情境，DeepSeek 仅提供流式回复。情境题只用于讨论方案，当前没有订单数据、文档检索、业务工具或审批执行。[README](../../README.md)说明现行操作，[面试题库](interview-question-bank.md)区分已实现与待实现。
 
@@ -12,7 +12,7 @@
 | 04 第一次非流式 LLM 调用 | COMPLETED | [Day 04 课件](lessons/day-04-first-llm-call.md)：单次问答 API/页面、输入/超时/错误/输出边界；当前 DeepSeek-only 复验见[最小评测样例](../evals/day-04-smoke.md)。旧测试文件删除后保留的 21/21 测试、lint/typecheck/build 通过。 |
 | 05 流式协议入门与 SSE 帧解析 | COMPLETED | [Day 05 课件](lessons/day-05-sse-streaming.md)：真实 DeepSeek SSE、同源透传、1–20 字节拆分、慢读、异常 EOF、400；lint/typecheck、现有 21/21 测试、build 通过。 |
 | 06 React 流式消费与消息状态管理 | COMPLETED | [Day 06 课件](lessons/day-06-react-stream-state.md)：提问记录、增量终态、近底部跟随；lint/typecheck、已有 21/21 测试、build 通过；浏览器交互待手动验收。 |
-| 07 AbortController 与 Node.js 取消传播 | NOT_STARTED | - |
+| 07 AbortController 与 Node.js 取消传播 | IN_PROGRESS | [Day 07 课件](lessons/day-07-cancellation.md)：停止按钮与前端、代理、Fastify、模型信号链路；静态检查及已有测试通过，按用户要求未启动项目或运行 build，真实断连待验收。 |
 | 08 Partial JSON 与结构化数据渐进解析 | NOT_STARTED | - |
 | 09 流式 Markdown 与 React 性能优化 | NOT_STARTED | - |
 | 10 Generative UI 安全组件注册表 | NOT_STARTED | - |
@@ -53,11 +53,13 @@
 
 ## 当前问题
 
+- Day 07 本轮实际执行 `pnpm lint`、`pnpm -r typecheck`、`pnpm -r test` 和 `git diff --check`，均 exit 0；已有 API 15/15、Web 6/6 测试不覆盖取消传播。未启动项目、未运行 build，也未实际验证浏览器断开后 Fastify 和 DeepSeek 是否停止；详见 [Day 07 课件](lessons/day-07-cancellation.md)。
+
 - 本轮整理后最终 `pnpm lint`、`pnpm typecheck`、`pnpm test`（API 15/15、Web 6/6）、`pnpm build` 均 exit 0；首页和 `/health` 返回 200。真实场景题发现默认思考模式会耗尽输出 token 并导致 502，修正为关闭思考模式、1024 token 上限、拒绝截断结果后，面试题和订单审批题均从同源入口返回 200 与正文。细节见 Day 04 课件；未做浏览器自动点击或手机截图。
 
 - 独立 Gemini 原始大纲文件未在仓库找到；现阶段只可对照最终总控中已整合的五部分和明确知识点。详情见 [覆盖矩阵](COVERAGE_MATRIX.md)。
 - 课程顺序从 16 课切为 40 Day、Day 03 提前实施和 Day 02 补课的依据及版本敏感 API 风险见 [决策日志](DECISION_LOG.md)。
 - 页面手机宽度视觉检查留给学习者手动验收；未宣称自动视觉测试通过。
-- 当前只支持 SSE 增量回复；Day 04 的非流式接口已按用户要求删除，历史课件仅保留当时的学习记录。没有会话记忆、浏览器断开后的完整取消传播、断线重放、工具调用或鉴权。API 缺 Key 不启动，且只绑定回环地址；公开部署前必须补鉴权、限流与成本控制。
+- 当前只支持 SSE 增量回复；Day 04 的非流式接口已按用户要求删除，历史课件仅保留当时的学习记录。Day 07 已接上浏览器到模型的取消信号，但未做运行时断连验收；没有会话记忆、断线重放、工具调用或鉴权。API 缺 Key 不启动，且只绑定回环地址；公开部署前必须补鉴权、限流与成本控制。
 - Day 05 的浏览器自动点击与手机截图未执行：本机 Work 设置禁用本地浏览器控制。真实 401/429、供应商中途故障和断线重连也未验证；详见 Day 05 课件。
 - 用户提供的 DeepSeek Key 曾出现在对话中；已再次提醒轮换，不能把 Git ignore 当作轮换替代。

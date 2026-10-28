@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import Link from "next/link";
 import { readApiHealth } from "../lib/api-health";
 import { AskPanel } from "./ask-panel";
 
@@ -14,10 +15,13 @@ export default async function Home() {
             <span aria-hidden="true" className="flex size-9 items-center justify-center rounded-md bg-[#173c42] text-sm font-semibold text-white">AI</span>
             <span className="text-base font-semibold">AI Native Console</span>
           </div>
-          <span className={`text-xs font-medium ${apiHealth.status === "connected" ? "text-[#2d6847]" : "text-[#a04237]"}`}>
-            <span aria-hidden="true">{apiHealth.status === "connected" ? "●" : "○"}</span>{" "}
-            {apiHealth.status === "connected" ? "API 运行中" : "API 暂不可用"}
-          </span>
+          <div className="flex items-center gap-5">
+            <Link href="/navigation-check" className="text-sm font-medium text-[#207a74] hover:underline">切换页面</Link>
+            <span className={`text-xs font-medium ${apiHealth.status === "connected" ? "text-[#2d6847]" : "text-[#a04237]"}`}>
+              <span aria-hidden="true">{apiHealth.status === "connected" ? "●" : "○"}</span>{" "}
+              {apiHealth.status === "connected" ? "API 运行中" : "API 暂不可用"}
+            </span>
+          </div>
         </div>
       </header>
 

@@ -11,7 +11,7 @@ const configSchema = z.object({
 
 export type ModelProvider = {
   model: string;
-  streamReply(instructions: string, prompt: string): AsyncIterable<string>;
+  streamReply(instructions: string, prompt: string, signal: AbortSignal): AsyncIterable<string>;
 };
 
 export class ModelTimeoutError extends Error {
@@ -45,8 +45,10 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
     };
   }
 
-  async function* streamReply(instructions: string, prompt: string) {
-    const abortSignal = AbortSignal.timeout(20_000);
+  async function* streamReply(instructions: string, prompt: string, signal: AbortSignal) {
+    // 用户取消与模型超时共用一个终止信号，异常映射时再区分原因。
+    const timeoutSignal = AbortSignal.timeout(20_000);
+    const abortSignal = AbortSignal.any([signal, timeoutSignal]);
     try {
       const result = streamText(requestOptions(instructions, prompt, abortSignal));
       let length = 0;
@@ -57,7 +59,7 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
       }
       if (!length || await result.finishReason !== "stop") throw new ModelOutputLimitError();
     } catch (error) {
-      if (abortSignal.aborted) throw new ModelTimeoutError();
+      if (timeoutSignal.aborted && !signal.aborted) throw new ModelTimeoutError();
       throw error;
     }
   }

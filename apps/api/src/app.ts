@@ -79,6 +79,12 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
     const requestId = request.id;
     const message = input.data.message;
     const provider = modelProvider;
+    const controller = new AbortController();
+    const onClose = () => {
+      // 正常完成也会触发 close；只有响应提前断开才取消模型。
+      if (!reply.raw.writableFinished) controller.abort();
+    };
+    reply.raw.once("close", onClose);
     // 流开始后不能再改 HTTP 状态，模型失败通过终止 error 事件通知页面。
     async function* events() {
       let sequence = 0;
@@ -86,11 +92,13 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
       yield ": connected\n\n";
       yield frame({ type: "start", requestId, provider: "deepseek", model: provider.model });
       try {
-        for await (const text of provider.streamReply(SYSTEM_INSTRUCTIONS, message)) {
+        for await (const text of provider.streamReply(SYSTEM_INSTRUCTIONS, message, controller.signal)) {
           yield frame({ type: "delta", text });
         }
+        if (controller.signal.aborted) return;
         yield frame({ type: "done", requestId });
       } catch (error) {
+        if (controller.signal.aborted) return;
         const code = error instanceof ModelTimeoutError ? "MODEL_TIMEOUT"
           : error instanceof ModelOutputLimitError ? "MODEL_INVALID_RESPONSE" : "MODEL_UNAVAILABLE";
         request.log.warn({ requestId, errorName: error instanceof Error ? error.name : "UnknownError" }, "model stream failed");
@@ -103,7 +111,9 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
       "cache-control": "no-cache, no-transform",
       "x-accel-buffering": "no",
     });
-    return reply.send(Readable.from(events()));
+    const stream = Readable.from(events());
+    stream.once("close", () => reply.raw.off("close", onClose));
+    return reply.send(stream);
   });
 
   return app;

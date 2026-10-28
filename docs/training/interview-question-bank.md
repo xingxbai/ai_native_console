@@ -79,6 +79,10 @@
 
 完整回答与追问见 [Day 06 课件](lessons/day-06-react-stream-state.md)：1. 如何设计 loading/streaming/complete/error 转移？2. 如何让自动滚动不打断阅读？3. 页面历史为何不等于模型记忆，何时才需要 Zustand？
 
+## Day 07：取消传播
+
+完整回答与追问见 [Day 07 课件](lessons/day-07-cancellation.md)：1. 前端 AbortController 能否保证模型停止？2. 为什么正常 `close` 不能当成取消？3. 主动取消、超时和异常 EOF 如何区分？代码与静态检查已完成，运行时断连待验收。
+
 ## 历史 L00
 
 旧 16 课体系的三道骨架题仍见 [L00 历史课件](lessons/L00-repository-bootstrap.md)。Day 01 采用了独立复测和更完整的面试追问结构；今后按 Day 编号更新此题库。

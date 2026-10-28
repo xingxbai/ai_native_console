@@ -20,6 +20,7 @@
 | D-012 / 2026-10-28 | Day 05 使用自定义、共享契约的 SSE 文本事件，保留 Day 04 完整回复作对照。 | 当前问题需 POST body；Fastify 从真实 DeepSeek `textStream` 编帧，Next 透传，浏览器增量 UTF-8 解码并等 `done`。事件 ID 仅关联顺序，无重放/取消语义；不引入模拟模型或 Day 06 状态库。 | 真实流 200、多 delta/`done`；1–20 字节拆分、慢读与异常 EOF；空白/坏 JSON 400；lint/typecheck、现有 21/21 测试、build。浏览器自动化因 Work 设置不可用。 |
 | D-013 / 2026-10-28 | Day 06 用单组件 React state 保存页面提问记录。 | 当前没有跨组件会话状态，暂不安装 Zustand；记录不发送给模型。只在接近底部时跟随滚动。 | lint/typecheck、现有 21/21 测试、build 通过；浏览器交互待手动验收。 |
 | D-014 / 2026-10-28 | 用户要求删除全部非流式回复代码，当前只保留 DeepSeek SSE 问答。 | 删除页面模式切换、Next/Fastify 非流式路由、`generateText` 方法与完整回复契约；Day 04 历史课件保留当时事实。后续代码关键流程用中文注释；不运行 build 或启动项目。 | 以本次 lint/typecheck/现有测试和代码搜索记录为准。 |
+| D-015 / 2026-10-28 | Day 07 连接浏览器、代理、Fastify 和 DeepSeek 的取消信号，进度暂记进行中。 | 用户要求不启动项目或运行 build；静态检查不能证明实际断连或供应商停止计费。 | lint/typecheck/已有测试；运行时点击停止、卸载与断连待手动验收。 |
 
 ## 待决策与风险
 
