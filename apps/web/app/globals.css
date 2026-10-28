@@ -8,3 +8,15 @@ body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.markdown-reply > * + * { margin-top: 0.75rem; }
+.markdown-reply h1, .markdown-reply h2, .markdown-reply h3 { font-weight: 600; }
+.markdown-reply ul { list-style: disc; padding-left: 1.5rem; }
+.markdown-reply ol { list-style: decimal; padding-left: 1.5rem; }
+.markdown-reply a { color: #176d69; text-decoration: underline; }
+.markdown-reply code { background: #e8eef0; padding: 0.1rem 0.25rem; }
+.markdown-reply pre { overflow-x: auto; background: #e8eef0; padding: 0.75rem; }
+.markdown-reply pre code { padding: 0; }
+.markdown-reply table { display: block; overflow-x: auto; border-collapse: collapse; }
+.markdown-reply th, .markdown-reply td { border: 1px solid #bdcbd0; padding: 0.35rem 0.6rem; text-align: left; }
+.markdown-reply blockquote { border-left: 3px solid #bdcbd0; padding-left: 0.75rem; color: #52646b; }

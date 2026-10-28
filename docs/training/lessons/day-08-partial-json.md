@@ -1,6 +1,6 @@
 # Day 08：Partial JSON 与结构化数据渐进解析
 
-日期：2026-10-28。状态：**IN_PROGRESS**。代码、类型与协议操作验收已完成；按用户要求没有启动项目、运行 build 或新增 `.test.ts`，真实 DeepSeek 结构化生成与浏览器展示待验收。
+日期：2026-10-28。状态：**IN_PROGRESS**。代码、类型与协议操作验收已完成；学习者提供了真实 DeepSeek 渐进事件和原页面完成截图。新增三列表格及失败路径仍待浏览器验收。按用户要求没有启动项目、运行 build 或新增 `.test.ts`。
 
 ## 1. 目标、前置与完成定义
 
@@ -25,7 +25,7 @@ DeepSeek 完成 -> result.output -> 完整 Zod Schema -> analysis_done SSE -> �
 | `apps/api/src/model-provider.ts` | DeepSeek `streamText` + `Output.object`；迭代 `partialOutputStream`，最终校验 `result.output` |
 | `apps/api/src/app.ts` | 复用现有 SSE 路由，按 format 发 `delta/done` 或 `partial/analysis_done` |
 | `apps/web/lib/sse.ts` | 校验事件模式、顺序和终态；部分对象只传给预览回调 |
-| `apps/web/app/ask-panel.tsx` | 展示逐步填充的三个字段；完整结果才标“最终对象已校验” |
+| `apps/web/app/ask-panel.tsx` | 用三列表格逐步填充三个字段；完整结果才标“最终对象已校验” |
 
 **模型侧：部分对象与最终对象分开。** 以下摘自 `model-provider.ts`，省略超时与错误映射：
 
@@ -76,6 +76,22 @@ if (event.type === "partial") {
 }
 ```
 
+**页面侧：同一个结构化对象填入固定表格。** 以下摘自 `ask-panel.tsx` 的关键单元格：
+
+```tsx
+<table aria-label="结构化分析结果">
+  <thead><tr><th scope="col">摘要</th><th scope="col">风险</th><th scope="col">下一步</th></tr></thead>
+  <tbody><tr>
+    {/* partial 是字段快照，单元格直接替换内容；缺失字段仍显示占位。 */}
+    {(["summary", "risk", "action"] as const).map((key) => (
+      <td key={key}>{(item.analysis ?? item.partial)?.[key] ?? "生成中"}</td>
+    ))}
+  </tr></tbody>
+</table>
+```
+
+表格只有一行，对应本课的一个分析对象；`partial` 每次是完整的当前快照，不是新增一行。实际页面给表格设置固定列宽，手机宽度可横向滚动。生成中的字段只是预览，`analysis_done` 到达后才用最终对象覆盖。
+
 ## 一、通用五大深水坑
 
 | 深水坑 | 本课处理 |
@@ -102,11 +118,12 @@ if (event.type === "partial") {
 
 - [x] 部分对象与最终对象的 Schema 边界通过操作验收。
 - [x] 结构化 SSE 事件按 1–20 字节切分，20/20 解析成功。
-- [ ] 真实 DeepSeek 在“结构化分析”模式下逐步返回三个字段，并以 `analysis_done` 结束。
+- [x] 学习者提供的真实 DeepSeek 响应含 102 个 `partial` 和最终 `analysis_done`，页面截图显示三字段与“最终对象已校验”；证据来自此前的段落展示。
+- [ ] 本次新增三列表格尚未做浏览器视觉验收。
 - [ ] 浏览器中途停止或断流时，片段保留且不显示“最终对象已校验”。
 - [ ] 非法最终对象、空流与供应商中途故障的运行时路径尚未注入验证。
 
-在已有运行环境打开首页，选择“结构化分析”，输入“运营要批量修改订单状态，给出摘要、一个风险和下一步”，观察字段逐步出现，完成后出现“最终对象已校验”。再试“文本问答”，确认原有纯文本路径仍能工作。可用 Network 检查 `partial` 与 `analysis_done`；若真实 DeepSeek 不支持该版本 SDK 的结构化输出，记录实际错误，不把静态检查当成模型兼容性证明。
+在已有运行环境打开首页，选择“结构化分析”，输入“运营要批量修改订单状态，给出摘要、一个风险和下一步”，观察表格的一行三列逐步填充，完成后出现“最终对象已校验”。手机宽度检查表格可横向滚动且文字不溢出。再试“文本问答”，确认原有纯文本路径仍能工作。可用 Network 检查 `partial` 与 `analysis_done`。
 
 ## 7. 排查
 

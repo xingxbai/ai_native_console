@@ -87,6 +87,10 @@
 
 完整回答与追问见 [Day 08 课件](lessons/day-08-partial-json.md)：1. 为什么不能对每个 chunk 直接 `JSON.parse`？2. 部分对象为何不能写入业务系统？3. HTTP 200 后缺少 `analysis_done` 如何处理？Schema 与拆帧已操作验收，真实 DeepSeek 结构化生成待验。
 
+## Day 09：流式 Markdown 与 React 性能
+
+完整回答与追问见 [Day 09 课件](lessons/day-09-markdown-performance.md)：1. 未闭合 Markdown 为何布局跳动？2. 模型 Markdown 的 HTML/链接安全边界是什么？3. 如何量化按帧合并的收益并证明不丢字？静态渲染已验，浏览器 Profiler 待验。
+
 ## 历史 L00
 
 旧 16 课体系的三道骨架题仍见 [L00 历史课件](lessons/L00-repository-bootstrap.md)。Day 01 采用了独立复测和更完整的面试追问结构；今后按 Day 编号更新此题库。

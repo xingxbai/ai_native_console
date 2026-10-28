@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { apiErrorResponseSchema, type Analysis } from "@ai-native-console/contracts";
 import { readStreamReply, StreamReplyError } from "../lib/sse";
+import { MarkdownReply } from "./markdown-reply";
 
 type Mode = "text" | "analysis";
 type Exchange = { id: number; question: string; mode: Mode; status: "loading" | "streaming" | "complete" | "cancelled" | "error"; content: string; partial?: Partial<Analysis>; analysis?: Analysis; error?: string; requestId?: string };
@@ -25,7 +26,7 @@ export function AskPanel() {
   const nextId = useRef(0);
   const listRef = useRef<HTMLDivElement>(null);
   const followRef = useRef(true);
-  const activeRequest = useRef<{ id: number; controller: AbortController } | null>(null);
+  const activeRequest = useRef<{ id: number; controller: AbortController; flush: () => void } | null>(null);
 
   // 用户查看旧记录时暂停自动跟随，新问题提交后恢复跟随。
   useEffect(() => {
@@ -47,7 +48,17 @@ export function AskPanel() {
 
     const id = ++nextId.current;
     const controller = new AbortController();
-    activeRequest.current = { id, controller };
+    let pendingContent: string | undefined;
+    let frame: number | undefined;
+    const flush = () => {
+      if (frame !== undefined) cancelAnimationFrame(frame);
+      frame = undefined;
+      // 停止或失败时保留尚未绘制的最后一段。
+      if (pendingContent !== undefined && !controller.signal.aborted)
+        updateExchange(id, { status: "streaming", content: pendingContent });
+      pendingContent = undefined;
+    };
+    activeRequest.current = { id, controller, flush };
     followRef.current = true;
     setBusy(true);
     setMessage("");
@@ -75,11 +86,22 @@ export function AskPanel() {
       const reply = await readStreamReply(
         response,
         mode,
-        (content) => { if (!controller.signal.aborted) updateExchange(id, { status: "streaming", content }); },
+        (content) => {
+          // 一帧内只安排一次页面更新，后续 delta 覆盖待提交的完整快照。
+          if (controller.signal.aborted) return;
+          pendingContent = content;
+          if (frame === undefined) frame = requestAnimationFrame(flush);
+        },
         (partial) => { if (!controller.signal.aborted) updateExchange(id, { status: "streaming", partial }); },
       );
-      if (!controller.signal.aborted) updateExchange(id, { status: "complete", content: reply.content, analysis: reply.analysis, requestId: reply.requestId });
+      if (!controller.signal.aborted) {
+        // done 自带完整正文，直接取消待绘制帧即可。
+        if (frame !== undefined) cancelAnimationFrame(frame);
+        frame = undefined;
+        updateExchange(id, { status: "complete", content: reply.content, analysis: reply.analysis, requestId: reply.requestId });
+      }
     } catch (error) {
+      if (!controller.signal.aborted) flush();
       if (!controller.signal.aborted) updateExchange(id, {
         status: "error",
         error: error instanceof StreamReplyError
@@ -87,6 +109,7 @@ export function AskPanel() {
           : "回复中断或格式异常，请重试。",
       });
     } finally {
+      if (frame !== undefined) cancelAnimationFrame(frame);
       if (activeRequest.current?.id === id) activeRequest.current = null;
       setBusy(false);
     }
@@ -96,6 +119,7 @@ export function AskPanel() {
     const active = activeRequest.current;
     if (!active) return;
     // 先锁定界面终态，再中断请求，避免迟到的 delta 覆盖“已停止”。
+    active.flush();
     updateExchange(active.id, { status: "cancelled" });
     active.controller.abort();
   }
@@ -146,7 +170,7 @@ export function AskPanel() {
             <p className="text-xs font-medium text-[#65747a]">问题</p>
             <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">{item.question}</p>
             <p className="mt-3 text-xs font-medium text-[#527c7e]">DeepSeek · {item.mode === "analysis" ? "结构化分析 · " : ""}{{ loading: "等待回复", streaming: "正在回复", complete: "已完成", cancelled: "已停止", error: "回复失败" }[item.status]}</p>
-            {item.content && <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-7">{item.content}</p>}
+            {item.content && <MarkdownReply content={item.content} streaming={item.status === "streaming"} />}
             {item.mode === "analysis" && (item.partial || item.analysis) && (
               <div className="mt-2 space-y-2 text-sm leading-6">
                 {([{"key":"summary","label":"摘要"},{"key":"risk","label":"风险"},{"key":"action","label":"下一步"}] as const).map(({ key, label }) => (

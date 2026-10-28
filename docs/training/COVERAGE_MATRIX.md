@@ -62,8 +62,8 @@
 | K12 | 禁止正则补全任意 JSON | 08 | 使用 SDK partialOutputStream 与最终 Zod；未用正则补全；异常 EOF 待运行验收 | 已安排；08 部分已验 |
 | K13 | Generative UI 组件白名单与 props Schema | 10 | 未知组件/非法属性拒绝，不执行 HTML/JSX | 已安排 |
 | K14 | 卡片骨架、图表固定尺寸、布局稳定 | 10、39 | 空数据/长标签/增量数据视觉测试 | 已安排 |
-| K15 | 高频 delta 全量重渲染与批处理取舍 | 09 | render count/Profiler，验证不丢字 | 已安排 |
-| K16 | 未闭合 Markdown 代码块、表格、链接与安全渲染 | 09 | 中途截断/长文本，禁 raw HTML | 已安排 |
+| K15 | 高频 delta 全量重渲染与批处理取舍 | 09 | 每浏览器帧合并最新全文；render count/Profiler 与最终不丢字待浏览器验收 | 已安排；09 代码已做 |
+| K16 | 未闭合 Markdown 代码块、表格、链接与安全渲染 | 09 | react-markdown/GFM；未闭合围栏原文降级、HTML/危险链接禁用的无服务渲染检查通过 | 已安排；09 静态渲染已验 |
 | K17 | 浏览器 AbortController 到 Node 模型取消 | 07 | 代码链路已接通；页面卸载/断连、服务端 signal 待运行时验收 | 已安排；07 进行中 |
 | K18 | close/aborted 正常结束与提前断开区别、资源清理 | 07 | 用 writableFinished 区分，监听器随流清理；运行时待验收 | 已安排；07 进行中 |
 | K19 | stop streaming、cancel model、cancel task 的语义 | 07、30 | 三种操作状态与日志可分辨 | 已安排 |
