@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { apiErrorResponseSchema, type Analysis } from "@ai-native-console/contracts";
+import { apiErrorResponseSchema, type Analysis, type Visual } from "@ai-native-console/contracts";
 import { readStreamReply, StreamReplyError } from "../lib/sse";
 import { MarkdownReply } from "./markdown-reply";
+import { VisualReply } from "./visual-reply";
 
-type Mode = "text" | "analysis";
-type Exchange = { id: number; question: string; mode: Mode; status: "loading" | "streaming" | "complete" | "cancelled" | "error"; content: string; partial?: Partial<Analysis>; analysis?: Analysis; error?: string; requestId?: string };
+type Mode = "text" | "analysis" | "visual";
+type Exchange = { id: number; question: string; mode: Mode; status: "loading" | "streaming" | "complete" | "cancelled" | "error"; content: string; partial?: Partial<Analysis>; analysis?: Analysis; visual?: Visual; error?: string; requestId?: string };
 
 const errorMessages: Record<string, string> = {
   BAD_REQUEST: "请求格式不正确，请重试。",
@@ -98,7 +99,7 @@ export function AskPanel() {
         // done 自带完整正文，直接取消待绘制帧即可。
         if (frame !== undefined) cancelAnimationFrame(frame);
         frame = undefined;
-        updateExchange(id, { status: "complete", content: reply.content, analysis: reply.analysis, requestId: reply.requestId });
+        updateExchange(id, { status: "complete", content: reply.content, analysis: reply.analysis, visual: reply.visual, requestId: reply.requestId });
       }
     } catch (error) {
       if (!controller.signal.aborted) flush();
@@ -128,7 +129,7 @@ export function AskPanel() {
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_19rem]">
       <div className="min-w-0">
       <div aria-label="回答类型" className="mb-5 inline-flex rounded-md border border-[#bdcbd0] bg-white p-0.5">
-        {([{"value":"text","label":"文本问答"},{"value":"analysis","label":"结构化分析"}] as const).map((option) => (
+        {([{"value":"text","label":"文本问答"},{"value":"analysis","label":"结构化分析"},{"value":"visual","label":"可视化"}] as const).map((option) => (
           <button key={option.value} type="button" aria-pressed={mode === option.value} disabled={busy}
             onClick={() => setMode(option.value)}
             className={`min-w-28 rounded px-3 py-1.5 text-sm disabled:cursor-not-allowed ${mode === option.value ? "bg-[#173c42] text-white" : "text-[#52646b] hover:text-[#173c42]"}`}>
@@ -169,8 +170,10 @@ export function AskPanel() {
           <div key={item.id} className="border-t border-[#dbe2e5] py-4">
             <p className="text-xs font-medium text-[#65747a]">问题</p>
             <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">{item.question}</p>
-            <p className="mt-3 text-xs font-medium text-[#527c7e]">DeepSeek · {item.mode === "analysis" ? "结构化分析 · " : ""}{{ loading: "等待回复", streaming: "正在回复", complete: "已完成", cancelled: "已停止", error: "回复失败" }[item.status]}</p>
+            <p className="mt-3 text-xs font-medium text-[#527c7e]">DeepSeek · {{ text: "文本问答", analysis: "结构化分析", visual: "可视化" }[item.mode]} · {{ loading: "等待回复", streaming: "正在回复", complete: "已完成", cancelled: "已停止", error: "回复失败" }[item.status]}</p>
             {item.content && <MarkdownReply content={item.content} streaming={item.status === "streaming"} />}
+            {item.mode === "visual" && (item.status === "loading" || item.status === "streaming") && <div className="mt-3 h-96 animate-pulse border-t border-[#dbe2e5] bg-[#f1f5f4]" aria-label="正在生成可视化" />}
+            {item.visual && <VisualReply value={item.visual} />}
             {item.mode === "analysis" && (item.partial || item.analysis) && (
               <div className="mt-2 space-y-2 text-sm leading-6">
                 {([{"key":"summary","label":"摘要"},{"key":"risk","label":"风险"},{"key":"action","label":"下一步"}] as const).map(({ key, label }) => (

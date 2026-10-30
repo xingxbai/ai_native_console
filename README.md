@@ -1,6 +1,6 @@
 # AI Native Console
 
-面向 AI Agent 工程面试与实际开发情境的个人学习项目。Day 01–06 已完成，Day 07–09 的剩余运行时与视觉验收见课件。首页输入面试题或场景题，由 DeepSeek 流式回答。模型不读取仓库或业务数据；工具调用、Agent 工作流和审批均未实现。
+面向 AI Agent 工程面试与实际开发情境的个人学习项目。Day 01–06 已完成，Day 07–10 的剩余运行时与视觉验收见课件。首页输入面试题或场景题，由 DeepSeek 回答。模型不读取仓库或业务数据；工具调用、Agent 工作流和审批均未实现。
 
 ## 运行
 
@@ -37,6 +37,8 @@ Web 使用 Next.js App Router、React、TypeScript、Tailwind CSS；API 使用 N
 
 文本问答使用安全的 GFM Markdown 展示列表、代码块和表格；未闭合代码围栏生成中先按原文展示。渲染与每帧合并的验收边界见 [Day 09 课件](docs/training/lessons/day-09-markdown-performance.md)。
 
+选择“可视化”时，DeepSeek 返回一个经校验的 `kpi/table/bar` 数据对象。页面先显示固定高度占位，收到 `visual_done` 后才展示 KPI、表格或 ECharts 柱状图。模型不能提供图表配置或 HTML；当前没有业务数据源，问题中的数字仅作示例。真实模型和浏览器视觉待验，见 [Day 10 课件](docs/training/lessons/day-10-generative-ui.md)。
+
 ## 验证
 
 ```bash
@@ -53,7 +55,7 @@ curl -N -i -X POST http://127.0.0.1:3100/api/chat/stream \
   --data '{"message":"Agent 与 Workflow 的适用边界是什么？"}'
 ```
 
-Day 07 已加入“停止”按钮和逐层取消信号；浏览器断开后模型是否及时停止仍待运行时验收，不能保证已产生的费用退回。断线重放、Partial JSON 和 Generative UI 分别在后续 Day 30、08、10 处理。
+Day 07 已加入“停止”按钮和逐层取消信号；浏览器断开后模型是否及时停止仍待运行时验收，不能保证已产生的费用退回。断线重放留待 Day 30。
 
 流式问答遇到停止、弱网、断网或关闭浏览器时的分层行为，见 [SSE 流式请求生命周期与取消速查](docs/training/SSE-STREAM-LIFECYCLE.md)。
 

@@ -1,4 +1,4 @@
-import { streamEventSchema, type Analysis, type StreamEvent } from "@ai-native-console/contracts";
+import { streamEventSchema, type Analysis, type StreamEvent, type Visual } from "@ai-native-console/contracts";
 
 type Frame = { event: string; id: string; data: string };
 
@@ -69,7 +69,7 @@ export class StreamReplyError extends Error {
 
 export async function readStreamReply(
   response: Response,
-  format: "text" | "analysis",
+  format: "text" | "analysis" | "visual",
   onDelta: (content: string) => void,
   onPartial: (value: Partial<Analysis>) => void,
 ) {
@@ -83,6 +83,7 @@ export async function readStreamReply(
   let completed = false;
   let content = "";
   let analysis: Analysis | undefined;
+  let visual: Visual | undefined;
   let sequence = 0;
 
   try {
@@ -114,6 +115,10 @@ export async function readStreamReply(
           if (format !== "analysis" || event.requestId !== requestId) throw new Error("Invalid analysis completion");
           analysis = event.value;
           completed = true;
+        } else if (event.type === "visual_done") {
+          if (format !== "visual" || event.requestId !== requestId) throw new Error("Invalid visual completion");
+          visual = event.value;
+          completed = true;
         } else if (event.type === "error") {
           if (event.requestId !== requestId) throw new Error("Invalid SSE error event");
           throw new StreamReplyError(event.code, event.message);
@@ -125,7 +130,7 @@ export async function readStreamReply(
     }
     parser.finish();
     if (!completed || !start) throw new Error("Stream ended before completion");
-    return { content, analysis, requestId: start.requestId, model: start.model };
+    return { content, analysis, visual, requestId: start.requestId, model: start.model };
   } finally {
     if (!completed) await reader.cancel().catch(() => {});
     reader.releaseLock();

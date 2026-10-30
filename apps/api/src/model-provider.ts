@@ -1,6 +1,6 @@
 import { createDeepSeek } from "@ai-sdk/deepseek";
 import { Output, streamText } from "ai";
-import { analysisSchema, partialAnalysisSchema, type Analysis } from "@ai-native-console/contracts";
+import { analysisSchema, partialAnalysisSchema, visualSchema, type Analysis, type Visual } from "@ai-native-console/contracts";
 import { z } from "zod";
 
 const promptSchema = z.string().trim().min(1).max(500);
@@ -14,6 +14,7 @@ export type ModelProvider = {
   model: string;
   streamReply(instructions: string, prompt: string, signal: AbortSignal): AsyncIterable<string>;
   streamAnalysis(instructions: string, prompt: string, signal: AbortSignal): AsyncIterable<{ type: "partial"; value: Partial<Analysis> } | { type: "final"; value: Analysis }>;
+  streamVisual(instructions: string, prompt: string, signal: AbortSignal): Promise<Visual>;
 };
 
 export class ModelTimeoutError extends Error {
@@ -90,9 +91,28 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
     }
   }
 
+  async function streamVisual(instructions: string, prompt: string, signal: AbortSignal) {
+    // 只接受三种固定组件的数据；完整对象通过 Schema 后才交给页面。
+    const timeoutSignal = AbortSignal.timeout(20_000);
+    const abortSignal = AbortSignal.any([signal, timeoutSignal]);
+    try {
+      const result = streamText({ ...requestOptions(instructions, prompt, abortSignal), output: Output.object({ schema: visualSchema }) });
+      // partial 只用于等待生成结束，不把未校验数据送往浏览器。
+      for await (const partial of result.partialOutputStream) { void partial; }
+      if (await result.finishReason !== "stop") throw new ModelOutputLimitError();
+      const visual = visualSchema.safeParse(await result.output);
+      if (!visual.success) throw new ModelOutputLimitError();
+      return visual.data;
+    } catch (error) {
+      if (timeoutSignal.aborted && !signal.aborted) throw new ModelTimeoutError();
+      throw error;
+    }
+  }
+
   return {
     model,
     streamReply,
     streamAnalysis,
+    streamVisual,
   };
 }

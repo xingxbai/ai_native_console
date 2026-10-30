@@ -14,6 +14,7 @@ import { ModelOutputLimitError, ModelTimeoutError, type ModelProvider } from "./
 
 const SYSTEM_INSTRUCTIONS = "Answer in the user's language, briefly and directly. Use at most three short paragraphs or bullets. Do not claim access to business data or tools.";
 const ANALYSIS_INSTRUCTIONS = "Analyze the user's engineering question in their language. Give a concise summary, one concrete risk, and one actionable next step. Do not claim access to business data or tools.";
+const VISUAL_INSTRUCTIONS = "Return one UI data object. Choose kpi for one number, table for comparison, or bar for a numeric comparison. Use short labels and at most eight rows. User-provided numbers are illustrative only; never invent business facts or claim access to live data.";
 
 class ApiError extends Error {
   constructor(readonly code: ApiErrorCode, readonly statusCode: number, message: string) {
@@ -94,7 +95,10 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
       yield ": connected\n\n";
       yield frame({ type: "start", requestId, provider: "deepseek", model: provider.model, format });
       try {
-        if (format === "analysis") {
+        if (format === "visual") {
+          const value = await provider.streamVisual(VISUAL_INSTRUCTIONS, message, controller.signal);
+          if (!controller.signal.aborted) yield frame({ type: "visual_done", value, requestId });
+        } else if (format === "analysis") {
           for await (const event of provider.streamAnalysis(ANALYSIS_INSTRUCTIONS, message, controller.signal)) {
             if (event.type === "partial") yield frame({ type: "partial", value: event.value });
             else yield frame({ type: "analysis_done", value: event.value, requestId });

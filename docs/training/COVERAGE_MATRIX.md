@@ -60,8 +60,8 @@
 | K10 | `Output.object`、`partialOutputStream`、`useObject` 版本核验 | 08 | 核对已安装 ai@7 类型与示例，Output.object/partialOutputStream 类型检查通过；未使用 useObject | 需补强：真实 DeepSeek 兼容性待验 |
 | K11 | 工具输入增量与结构化输出 partial stream 不混用 | 08、11 | 分离两种事件与 UI 状态测试 | 已安排 |
 | K12 | 禁止正则补全任意 JSON | 08 | 使用 SDK partialOutputStream 与最终 Zod；未用正则补全；异常 EOF 待运行验收 | 已安排；08 部分已验 |
-| K13 | Generative UI 组件白名单与 props Schema | 10 | 未知组件/非法属性拒绝，不执行 HTML/JSX | 已安排 |
-| K14 | 卡片骨架、图表固定尺寸、布局稳定 | 10、39 | 空数据/长标签/增量数据视觉测试 | 已安排 |
+| K13 | Generative UI 组件白名单与 props Schema | 10 | `kpi/table/bar` 判别 Schema、服务端最终校验和前端再次校验；真实模型待验 | 10 代码已做，运行待验 |
+| K14 | 卡片骨架、图表固定尺寸、布局稳定 | 10、39 | 生成中与结果均预留高度；窄屏/长标签/Layout Shift 待浏览器验收 | 10 代码已做，视觉待验 |
 | K15 | 高频 delta 全量重渲染与批处理取舍 | 09 | 每浏览器帧合并最新全文；render count/Profiler 与最终不丢字待浏览器验收 | 已安排；09 代码已做 |
 | K16 | 未闭合 Markdown 代码块、表格、链接与安全渲染 | 09 | react-markdown/GFM；未闭合围栏原文降级、HTML/危险链接禁用的无服务渲染检查通过 | 已安排；09 静态渲染已验 |
 | K17 | 浏览器 AbortController 到 Node 模型取消 | 07 | 代码链路已接通；页面卸载/断连、服务端 signal 待运行时验收 | 已安排；07 进行中 |
@@ -95,7 +95,7 @@
 | K45 | 审批后二次鉴权、数据版本与幂等副作用 | 25、29、37 | 重复确认只执行一次 | 已安排 |
 | K46 | React/Next App Router/TypeScript/Tailwind | 01、06、10 | 静态页已构建；后续交互/布局测试 | 已安排；01 已复测 |
 | K47 | Zustand 只承载跨组件会话/run/审批状态 | 06、28 | Day 06 单组件使用 React state；跨组件状态留给 Day 28 | 已安排；06 已解释取舍 |
-| K48 | ECharts 只接收验证过的数据与固定容器 | 10、31 | 非法 option/空数据/尺寸测试 | 已安排 |
+| K48 | ECharts 只接收验证过的数据与固定容器 | 10、31 | ECharts option 由应用生成，模型仅提供最多 8 行数值；真实图表尺寸待验 | 10 代码已做，视觉待验 |
 | K49 | React Flow 画布与后端执行 JSON 分层 | 26–27 | 坏节点/边/环路拒绝 | 已安排 |
 | K50 | Run 状态机、重复/乱序 SSE 事件、traceId | 28、35 | 非法迁移、事件去重、串联 trace | 已安排 |
 | K51 | Node 错误处理、超时、限流、缓存、熔断 | 02、15、30、36 | Day 02：统一 400/404/500 错误体；超时/限流/降级待后续 Day | 已安排；02 错误体已验收 |

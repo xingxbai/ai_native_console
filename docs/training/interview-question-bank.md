@@ -91,6 +91,10 @@
 
 完整回答与追问见 [Day 09 课件](lessons/day-09-markdown-performance.md)：1. 未闭合 Markdown 为何布局跳动？2. 模型 Markdown 的 HTML/链接安全边界是什么？3. 如何量化按帧合并的收益并证明不丢字？静态渲染已验，浏览器 Profiler 待验。
 
+## Day 10：Generative UI 安全组件注册表
+
+完整回答与追问见 [Day 10 课件](lessons/day-10-generative-ui.md)：1. 为什么不执行模型生成的 JSX 或 ECharts option？2. 为什么只在 `visual_done` 后渲染图表？3. 如何测量占位到结果的布局偏移？当前只有静态检查与现有测试，真实模型及浏览器视觉待验。
+
 ## 历史 L00
 
 旧 16 课体系的三道骨架题仍见 [L00 历史课件](lessons/L00-repository-bootstrap.md)。Day 01 采用了独立复测和更完整的面试追问结构；今后按 Day 编号更新此题库。

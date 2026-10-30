@@ -1,6 +1,6 @@
 # 学习进度
 
-更新日期：2026-10-28。**Day 01–06 已完成；Day 07–09 进行中，部分运行时与视觉验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
+更新日期：2026-10-28。**Day 01–06 已完成；Day 07–10 进行中，部分运行时与视觉验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
 
 当前练习主线：主页输入面试题或真实工程情境，DeepSeek 仅提供流式回复。情境题只用于讨论方案，当前没有订单数据、文档检索、业务工具或审批执行。[README](../../README.md)说明现行操作，[面试题库](interview-question-bank.md)区分已实现与待实现。
 
@@ -15,7 +15,7 @@
 | 07 AbortController 与 Node.js 取消传播 | IN_PROGRESS | [Day 07 课件](lessons/day-07-cancellation.md)：停止按钮与前端、代理、Fastify、模型信号链路；静态检查及已有测试通过，按用户要求未启动项目或运行 build，真实断连待验收。 |
 | 08 Partial JSON 与结构化数据渐进解析 | IN_PROGRESS | [Day 08 课件](lessons/day-08-partial-json.md)：Schema 和 1–20 字节 SSE 拆分已验；学习者提供真实 102 个 partial、analysis_done 及三字段完成截图。新增三列表格和失败路径待浏览器验收。 |
 | 09 流式 Markdown 与 React 性能优化 | IN_PROGRESS | [Day 09 课件](lessons/day-09-markdown-performance.md)：体验逐次更新基线后，已加入 `requestAnimationFrame` 按帧合并；学习者未观察到基线明显卡顿，Profiler 对照和浏览器视觉待验。 |
-| 10 Generative UI 安全组件注册表 | NOT_STARTED | - |
+| 10 Generative UI 安全组件注册表 | IN_PROGRESS | [Day 10 课件](lessons/day-10-generative-ui.md)：真实 DeepSeek 的受控 KPI/表格/柱状图协议和固定高度占位；静态检查、现有测试通过，模型输出与浏览器视觉待验。 |
 | 11 Function/Tool Calling 运行机制 | NOT_STARTED | - |
 | 12 Zod 工具契约与描述设计 | NOT_STARTED | - |
 | 13 工具注册、服务端执行与权限边界 | NOT_STARTED | - |
@@ -52,6 +52,8 @@
 - 原 L00 已在前一轮完成，证据位于 [L00 历史课件](lessons/L00-repository-bootstrap.md)。本轮 Day 01 复用代码，重新运行验收并形成独立课件。
 
 ## 当前问题
+
+- Day 10 `echarts` 安装完成，`pnpm lint`、`pnpm -r typecheck`、`pnpm -r test`（API 15/15、Web 6/6）、`git diff --check` 均 exit 0；已有测试不覆盖新增可视化链路。按要求未启动项目、未运行 build、未调用真实 DeepSeek；三种输出、窄屏和布局偏移仍待手动验收。
 
 - Day 09 新增 react-markdown/remark-gfm；先前无服务渲染检查的 GFM 表格、HTML/图片/危险链接禁用和未闭合围栏降级四项通过。学习者体验逐次更新基线后未观察到明显卡顿，随后要求加入 `requestAnimationFrame`；现已加入按帧合并，Profiler 对照尚未测量。调整后 `pnpm lint`、`pnpm -r typecheck`、`pnpm -r test`（API 15/15、Web 6/6）、`git diff --check` 均 exit 0。未启动项目或运行 build。
 
