@@ -69,7 +69,7 @@
 | K19 | stop streaming、cancel model、cancel task 的语义 | 07、30 | 三种操作状态与日志可分辨 | 已安排 |
 | K20 | SSE Last-Event-ID/事件重放与 Agent checkpoint resume 区别 | 23、30 | 只恢复已存事件，不重跑副作用 | 已安排 |
 | K21 | AI SDK `useChat` resume 与 abort 兼容限制 | 07、30 | 官方版本核查及选定产品语义 | 需补强：届时核对 API |
-| K22 | Function/Tool Calling：模型提出、应用执行、结果回传 | 11 | trace 可见三阶段与普通回答 | 已安排 |
+| K22 | Function/Tool Calling：模型提出、应用执行、结果回传 | 11 | Node 对 JSONPlaceholder 出站 1 次，DeepSeek 回答 20/11/9；浏览器只收文本，视觉待验 | 11 外部 HTTP/模型路径已验 |
 | K23 | Zod 参数类型、枚举、optional/nullable、description | 12 | 错类型/枚举/缺字段测试 | 已安排 |
 | K24 | Schema、业务规则、身份权限、租户范围是不同层 | 12–13、37 | Schema 通过但无权仍拒绝 | 已安排 |
 | K25 | 服务端工具 allowlist 与未知工具拒绝 | 13 | 未注册工具绝不执行 | 已安排 |

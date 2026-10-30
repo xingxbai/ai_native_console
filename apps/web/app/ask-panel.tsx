@@ -6,8 +6,8 @@ import { readStreamReply, StreamReplyError } from "../lib/sse";
 import { MarkdownReply } from "./markdown-reply";
 import { VisualReply } from "./visual-reply";
 
-type Mode = "text" | "analysis" | "visual";
-type Exchange = { id: number; question: string; mode: Mode; status: "loading" | "streaming" | "complete" | "cancelled" | "error"; content: string; partial?: Partial<Analysis>; analysis?: Analysis; visual?: Visual; error?: string; requestId?: string };
+type Mode = "text" | "analysis" | "visual" | "tool";
+type Exchange = { id: number; question: string; mode: Mode; status: "loading" | "streaming" | "complete" | "cancelled" | "error"; content: string; source?: "deepseek" | "local"; partial?: Partial<Analysis>; analysis?: Analysis; visual?: Visual; error?: string; requestId?: string };
 
 const errorMessages: Record<string, string> = {
   BAD_REQUEST: "请求格式不正确，请重试。",
@@ -94,6 +94,7 @@ export function AskPanel() {
           if (frame === undefined) frame = requestAnimationFrame(flush);
         },
         (partial) => { if (!controller.signal.aborted) updateExchange(id, { status: "streaming", partial }); },
+        (source) => { if (!controller.signal.aborted) updateExchange(id, { source }); },
       );
       if (!controller.signal.aborted) {
         // done 自带完整正文，直接取消待绘制帧即可。
@@ -129,7 +130,7 @@ export function AskPanel() {
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_19rem]">
       <div className="min-w-0">
       <div aria-label="回答类型" className="mb-5 inline-flex rounded-md border border-[#bdcbd0] bg-white p-0.5">
-        {([{"value":"text","label":"文本问答"},{"value":"analysis","label":"结构化分析"},{"value":"visual","label":"可视化"}] as const).map((option) => (
+        {([{"value":"text","label":"文本问答"},{"value":"analysis","label":"结构化分析"},{"value":"visual","label":"可视化"},{"value":"tool","label":"工具问答"}] as const).map((option) => (
           <button key={option.value} type="button" aria-pressed={mode === option.value} disabled={busy}
             onClick={() => setMode(option.value)}
             className={`min-w-28 rounded px-3 py-1.5 text-sm disabled:cursor-not-allowed ${mode === option.value ? "bg-[#173c42] text-white" : "text-[#52646b] hover:text-[#173c42]"}`}>
@@ -170,9 +171,11 @@ export function AskPanel() {
           <div key={item.id} className="border-t border-[#dbe2e5] py-4">
             <p className="text-xs font-medium text-[#65747a]">问题</p>
             <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">{item.question}</p>
-            <p className="mt-3 text-xs font-medium text-[#527c7e]">DeepSeek · {{ text: "文本问答", analysis: "结构化分析", visual: "可视化" }[item.mode]} · {{ loading: "等待回复", streaming: "正在回复", complete: "已完成", cancelled: "已停止", error: "回复失败" }[item.status]}</p>
-            {item.content && <MarkdownReply content={item.content} streaming={item.status === "streaming"} />}
-            {item.mode === "visual" && (item.status === "loading" || item.status === "streaming") && <div className="mt-3 h-96 animate-pulse border-t border-[#dbe2e5] bg-[#f1f5f4]" aria-label="正在生成可视化" />}
+            <p className="mt-3 text-xs font-medium text-[#527c7e]">{item.source === "local" ? "本地数据" : "DeepSeek"} · {{ text: "文本问答", analysis: "结构化分析", visual: "可视化", tool: "工具问答" }[item.mode]} · {{ loading: "等待回复", streaming: "正在回复", complete: "已完成", cancelled: "已停止", error: "回复失败" }[item.status]}</p>
+            {item.content && (item.source === "local"
+              ? <pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap break-all rounded border border-[#dbe2e5] bg-[#f7f9f9] p-3 text-xs">{item.content}</pre>
+              : <MarkdownReply content={item.content} streaming={item.status === "streaming"} />)}
+            {item.source !== "local" && item.mode === "visual" && (item.status === "loading" || item.status === "streaming") && <div className="mt-3 h-96 animate-pulse border-t border-[#dbe2e5] bg-[#f1f5f4]" aria-label="正在生成可视化" />}
             {item.visual && <VisualReply value={item.visual} />}
             {item.mode === "analysis" && (item.partial || item.analysis) && (
               <div className="mt-2 space-y-2 text-sm leading-6">

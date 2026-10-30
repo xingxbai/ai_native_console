@@ -69,9 +69,10 @@ export class StreamReplyError extends Error {
 
 export async function readStreamReply(
   response: Response,
-  format: "text" | "analysis" | "visual",
+  format: "text" | "analysis" | "visual" | "tool",
   onDelta: (content: string) => void,
   onPartial: (value: Partial<Analysis>) => void,
+  onStart: (provider: "deepseek" | "local") => void,
 ) {
   if (!response.body || !response.headers.get("content-type")?.startsWith("text/event-stream")) {
     throw new Error("Invalid stream response");
@@ -100,12 +101,14 @@ export async function readStreamReply(
             throw new Error("Invalid SSE start event");
           }
           start = event;
+          onStart(event.provider);
         } else if (!start || completed) {
           throw new Error("Unexpected SSE event");
         } else if (event.type === "delta") {
-          if (format !== "text") throw new Error("Unexpected text event");
+          if (format !== "text" && format !== "tool" && start.provider !== "local") throw new Error("Unexpected text event");
           content += event.text;
-          if (content.length > 4_000) throw new Error("Stream reply is too long");
+          // 本地 JSON 比模型回答大，单独放宽上限；仍限制异常大响应。
+          if (content.length > (start.provider === "local" ? 2_000_000 : 4_000)) throw new Error("Stream reply is too long");
           onDelta(content);
         } else if (event.type === "partial") {
           if (format !== "analysis") throw new Error("Unexpected partial event");
@@ -123,7 +126,7 @@ export async function readStreamReply(
           if (event.requestId !== requestId) throw new Error("Invalid SSE error event");
           throw new StreamReplyError(event.code, event.message);
         } else {
-          if (format !== "text" || event.requestId !== requestId || !content.trim()) throw new Error("Invalid SSE completion");
+          if (((format !== "text" && format !== "tool") && start.provider !== "local") || event.requestId !== requestId || !content.trim()) throw new Error("Invalid SSE completion");
           completed = true;
         }
       }

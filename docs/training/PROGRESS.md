@@ -1,8 +1,8 @@
 # 学习进度
 
-更新日期：2026-10-28。**Day 01–06 已完成；Day 07–10 进行中，部分运行时与视觉验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
+更新日期：2026-10-30。**Day 01–06 已完成；Day 07–11 进行中，部分运行时与视觉验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
 
-当前练习主线：主页输入面试题或真实工程情境，DeepSeek 仅提供流式回复。情境题只用于讨论方案，当前没有订单数据、文档检索、业务工具或审批执行。[README](../../README.md)说明现行操作，[面试题库](interview-question-bank.md)区分已实现与待实现。
+当前练习主线：主页输入面试题或真实工程情境，DeepSeek 提供流式回复；Day 11 增加只读的公网演示统计 API 工具。情境题只用于讨论方案，当前没有真实订单数据、文档检索、业务工具或审批执行。[README](../../README.md)说明现行操作，[面试题库](interview-question-bank.md)区分已实现与待实现。
 
 | Day | 状态 | 证据/下一步 |
 | --- | --- | --- |
@@ -16,7 +16,7 @@
 | 08 Partial JSON 与结构化数据渐进解析 | IN_PROGRESS | [Day 08 课件](lessons/day-08-partial-json.md)：Schema 和 1–20 字节 SSE 拆分已验；学习者提供真实 102 个 partial、analysis_done 及三字段完成截图。新增三列表格和失败路径待浏览器验收。 |
 | 09 流式 Markdown 与 React 性能优化 | IN_PROGRESS | [Day 09 课件](lessons/day-09-markdown-performance.md)：体验逐次更新基线后，已加入 `requestAnimationFrame` 按帧合并；学习者未观察到基线明显卡顿，Profiler 对照和浏览器视觉待验。 |
 | 10 Generative UI 安全组件注册表 | IN_PROGRESS | [Day 10 课件](lessons/day-10-generative-ui.md)：真实 DeepSeek 的受控 KPI/表格/柱状图协议和固定高度占位；静态检查、现有测试通过，模型输出与浏览器视觉待验。 |
-| 11 Function/Tool Calling 运行机制 | NOT_STARTED | - |
+| 11 Function/Tool Calling 运行机制 | IN_PROGRESS | [Day 11 课件](lessons/day-11-tool-calling.md)：Node 请求 JSONPlaceholder 用户 1 示例任务，真实出站计数 1 次，DeepSeek 回答 20/11/9；浏览器 SSE 与断连待验。 |
 | 12 Zod 工具契约与描述设计 | NOT_STARTED | - |
 | 13 工具注册、服务端执行与权限边界 | NOT_STARTED | - |
 | 14 参数校验失败与有界自纠错 | NOT_STARTED | - |
@@ -52,6 +52,8 @@
 - 原 L00 已在前一轮完成，证据位于 [L00 历史课件](lessons/L00-repository-bootstrap.md)。本轮 Day 01 复用代码，重新运行验收并形成独立课件。
 
 ## 当前问题
+
+- Day 11 最终选择 JSONPlaceholder 公网示例任务 API：用户 1 总数 20、完成 11、未完成 9；真实 DeepSeek 回答一致且注明示例性质，出站计数 1 次。先试 DummyJSON 时曾成功读取，但后续 Node 连接多次超时；JSONPlaceholder 链路最终复测通过。`pnpm lint`、`pnpm -r typecheck`、`pnpm -r test`（API 15/15、Web 6/6）、`git diff --check` 均 exit 0。未启动项目、未运行 build，也未做浏览器交互或断连验收。
 
 - Day 10 `echarts` 安装完成，`pnpm lint`、`pnpm -r typecheck`、`pnpm -r test`（API 15/15、Web 6/6）、`git diff --check` 均 exit 0；已有测试不覆盖新增可视化链路。按要求未启动项目、未运行 build、未调用真实 DeepSeek；三种输出、窄屏和布局偏移仍待手动验收。
 

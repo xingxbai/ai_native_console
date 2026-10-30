@@ -1,6 +1,6 @@
 # AI Native Console
 
-面向 AI Agent 工程面试与实际开发情境的个人学习项目。Day 01–06 已完成，Day 07–10 的剩余运行时与视觉验收见课件。首页输入面试题或场景题，由 DeepSeek 回答。模型不读取仓库或业务数据；工具调用、Agent 工作流和审批均未实现。
+面向 AI Agent 工程面试与实际开发情境的个人学习项目。Day 01–06 已完成，Day 07–11 的剩余运行时与视觉验收见课件。首页输入面试题或场景题，由 DeepSeek 回答。当前唯一工具读取 JSONPlaceholder 公网演示任务数据并做统计；模型不读取仓库或真实业务数据，Agent 工作流和审批均未实现。
 
 ## 运行
 
@@ -38,6 +38,8 @@ Web 使用 Next.js App Router、React、TypeScript、Tailwind CSS；API 使用 N
 文本问答使用安全的 GFM Markdown 展示列表、代码块和表格；未闭合代码围栏生成中先按原文展示。渲染与每帧合并的验收边界见 [Day 09 课件](docs/training/lessons/day-09-markdown-performance.md)。
 
 选择“可视化”时，DeepSeek 返回一个经校验的 `kpi/table/bar` 数据对象。页面先显示固定高度占位，收到 `visual_done` 后才展示 KPI、表格或 ECharts 柱状图。模型不能提供图表配置或 HTML；当前没有业务数据源，问题中的数字仅作示例。真实模型和浏览器视觉待验，见 [Day 10 课件](docs/training/lessons/day-10-generative-ui.md)。
+
+选择“工具问答”后，问“请查询示例任务统计系统的用户1：总任务数、已完成数和未完成数分别是多少？”模型可调用 `getDemoTaskStats`；Node 服务端请求 JSONPlaceholder 的用户 1 任务 API，校验后计算汇总，浏览器只收最终回答的文本流。数据是公开示例，不是真实业务指标。真实 DeepSeek 与外部 HTTP 路径已验，完整浏览器展示待验，见 [Day 11 课件](docs/training/lessons/day-11-tool-calling.md)。
 
 ## 验证
 

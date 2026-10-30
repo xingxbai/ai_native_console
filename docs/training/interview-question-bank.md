@@ -95,6 +95,10 @@
 
 完整回答与追问见 [Day 10 课件](lessons/day-10-generative-ui.md)：1. 为什么不执行模型生成的 JSX 或 ECharts option？2. 为什么只在 `visual_done` 后渲染图表？3. 如何测量占位到结果的布局偏移？当前只有静态检查与现有测试，真实模型及浏览器视觉待验。
 
+## Day 11：Function / Tool Calling 运行机制
+
+完整回答与追问见 [Day 11 课件](lessons/day-11-tool-calling.md)：1. 模型提出调用与 Node 实际请求外部 API 有何不同？2. 外部 JSON 为什么还要运行时校验？3. 为什么不把完整工具结果发给浏览器？真实 DummyJSON 数据与 DeepSeek 回答已对照，浏览器展示待验。
+
 ## 历史 L00
 
 旧 16 课体系的三道骨架题仍见 [L00 历史课件](lessons/L00-repository-bootstrap.md)。Day 01 采用了独立复测和更完整的面试追问结构；今后按 Day 编号更新此题库。

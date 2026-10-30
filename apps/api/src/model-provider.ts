@@ -1,7 +1,8 @@
 import { createDeepSeek } from "@ai-sdk/deepseek";
-import { Output, streamText } from "ai";
+import { Output, stepCountIs, streamText, tool } from "ai";
 import { analysisSchema, partialAnalysisSchema, visualSchema, type Analysis, type Visual } from "@ai-native-console/contracts";
 import { z } from "zod";
+import { getDemoTaskStats, getDemoUserInfo } from "./demo-stats.js";
 
 const promptSchema = z.string().trim().min(1).max(500);
 const instructionsSchema = z.string().trim().min(1).max(500);
@@ -15,6 +16,7 @@ export type ModelProvider = {
   streamReply(instructions: string, prompt: string, signal: AbortSignal): AsyncIterable<string>;
   streamAnalysis(instructions: string, prompt: string, signal: AbortSignal): AsyncIterable<{ type: "partial"; value: Partial<Analysis> } | { type: "final"; value: Analysis }>;
   streamVisual(instructions: string, prompt: string, signal: AbortSignal): Promise<Visual>;
+  streamToolReply(instructions: string, prompt: string, signal: AbortSignal): AsyncIterable<string>;
 };
 
 export class ModelTimeoutError extends Error {
@@ -109,10 +111,58 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
     }
   }
 
+  async function* streamToolReply(instructions: string, prompt: string, signal: AbortSignal) {
+    // 外部 HTTP 加两轮模型调用可能超过普通问答的 20 秒，单独给工具模式 40 秒。
+    const timeoutSignal = AbortSignal.timeout(40_000);
+    const abortSignal = AbortSignal.any([signal, timeoutSignal]);
+    try {
+      const result = streamText({
+        ...requestOptions(instructions, prompt, abortSignal),
+        tools: {
+          getDemoTaskStats: tool({
+            description: "Fetch the public JSONPlaceholder demo API with userId=1 fixed in the URL. Return only that user's total, completed, and pending task counts. Use for questions about demo user 1 task statistics. These are sample data, not real business metrics.",
+            inputSchema: z.strictObject({}),
+            // 模型只提出调用；Node 服务端实际请求公网示例接口。
+            execute: async () => getDemoTaskStats(abortSignal),
+          }),
+
+          getDemoUserInfo: tool({
+            description: "获取当前用户信息。返回用户的 id、name、username、email、phone、website 等字段。用于回答关于当前用户的个人信息问题。",
+            inputSchema: z.strictObject({}),
+            execute: async () => {
+              return getDemoUserInfo(abortSignal);
+            }
+          })
+        },
+        // 最多一次工具调用，再让模型根据结果作答。
+        stopWhen: stepCountIs(2),
+        prepareStep: ({ stepNumber }) => stepNumber === 0 ? {} : { activeTools: [] },
+      });
+      let length = 0;
+      for await (const part of result.fullStream) {
+        if (part.type === "tool-error") {
+          throw part.error;
+        } else if (part.type === "error") {
+          // SDK 将连接失败放进流事件；必须作为模型故障上报，不能误判成输出截断。
+          throw part.error;
+        } else if (part.type === "text-delta" && part.text) {
+          length += part.text.length;
+          if (length > 4_000) throw new ModelOutputLimitError();
+          yield part.text;
+        }
+      }
+      if (!length || await result.finishReason !== "stop") throw new ModelOutputLimitError();
+    } catch (error) {
+      if (timeoutSignal.aborted && !signal.aborted) throw new ModelTimeoutError();
+      throw error;
+    }
+  }
+
   return {
     model,
     streamReply,
     streamAnalysis,
     streamVisual,
+    streamToolReply,
   };
 }

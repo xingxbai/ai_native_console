@@ -10,7 +10,7 @@ export const healthResponseSchema = z.strictObject({
 
 export const chatRequestSchema = z.strictObject({
   message: z.string().trim().min(1).max(500),
-  format: z.enum(["text", "analysis", "visual"]).optional(),
+  format: z.enum(["text", "analysis", "visual", "tool"]).optional(),
 });
 
 export const analysisSchema = z.strictObject({
@@ -31,9 +31,9 @@ export const streamEventSchema = z.discriminatedUnion("type", [
   z.strictObject({
     type: z.literal("start"),
     requestId: requestIdSchema,
-    provider: z.literal("deepseek"),
+    provider: z.enum(["deepseek", "local"]),
     model: z.string().min(1),
-    format: z.enum(["text", "analysis", "visual"]),
+    format: z.enum(["text", "analysis", "visual", "tool"]),
   }),
   z.strictObject({ type: z.literal("delta"), text: z.string().min(1) }),
   z.strictObject({ type: z.literal("partial"), value: partialAnalysisSchema }),
