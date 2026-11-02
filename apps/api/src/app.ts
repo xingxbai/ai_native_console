@@ -16,7 +16,7 @@ import { findDirectTool } from "./direct-tools.js";
 const SYSTEM_INSTRUCTIONS = "Answer in the user's language, briefly and directly. Use at most three short paragraphs or bullets. Do not claim access to business data or tools.";
 const ANALYSIS_INSTRUCTIONS = "Analyze the user's engineering question in their language. Give a concise summary, one concrete risk, and one actionable next step. Do not claim access to business data or tools.";
 const VISUAL_INSTRUCTIONS = "Return one UI data object. Choose kpi for one number, table for comparison, or bar for a numeric comparison. Use short labels and at most eight rows. User-provided numbers are illustrative only; never invent business facts or claim access to live data.";
-const TOOL_INSTRUCTIONS = "用用户的语言回答。询问演示任务统计时调用 getDemoTaskStats；询问当前用户信息时调用 getDemoUserInfo；询问本周退款数量及原因时调用 getRefundComparison。退款工具只提供两周数量和本周原因分布，不能据此断言退款增长的因果原因，还需要上周原因和订单总量。所有工具数据均为演示数据，不是真实业务指标；不要编造缺失数据。其他问题直接回答。";
+const TOOL_INSTRUCTIONS = "用用户的语言回答。询问演示任务统计时调用 getDemoTaskStats；询问当前用户信息时调用 getDemoUserInfo；询问本周退款数量及原因时调用 getRefundComparison；询问指定演示订单时调用 getOrderDetail。退款工具只提供两周数量和本周原因分布，不能据此断言退款增长的因果原因。所有工具数据均为演示数据，不是真实业务指标；不要编造缺失数据。其他问题直接回答。";
 
 class ApiError extends Error {
   constructor(readonly code: ApiErrorCode, readonly statusCode: number, message: string) {

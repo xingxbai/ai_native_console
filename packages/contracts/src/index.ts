@@ -13,6 +13,20 @@ export const chatRequestSchema = z.strictObject({
   format: z.enum(["text", "analysis", "visual", "tool"]).optional(),
 });
 
+// 工具参数只表达查询意图；是否有权查询该订单须由服务端另行判断。
+export const getOrderDetailInputSchema = z.strictObject({
+  orderId: z.number().int().positive().max(999_999).describe("要查询的演示订单编号，例如 123"),
+  view: z.enum(["status", "detail"]).optional().describe("只问状态时选 status；需要订单详情时选 detail，省略时返回详情"),
+});
+
+export const getOrderDetailOutputSchema = z.strictObject({
+  orderId: z.number().int().positive(),
+  status: z.string(),
+  customer: z.string().optional(),
+  amount: z.number().nonnegative().optional(),
+  refundReason: z.string().nullable().optional(),
+});
+
 export const analysisSchema = z.strictObject({
   summary: z.string().trim().min(1).max(500),
   risk: z.string().trim().min(1).max(500),

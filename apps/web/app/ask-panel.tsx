@@ -16,6 +16,7 @@ const demoQuestions = [
   "列出退款金额最高的 10 笔订单",
   "把这份 JSON 转成表格",
   "这周退款为什么变多了？",
+  "请查询演示订单 124 的退款原因",
 ] as const;
 
 const errorMessages: Record<string, string> = {

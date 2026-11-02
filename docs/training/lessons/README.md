@@ -17,6 +17,7 @@
 | [Day 09：流式 Markdown 与 React 性能优化](day-09-markdown-performance.md) | GFM 安全渲染、未闭合围栏降级和按帧合并；视觉及 Profiler 待验。 |
 | [Day 10：Generative UI 安全组件注册表](day-10-generative-ui.md) | DeepSeek 只输出受控 KPI/表格/柱状图数据；真实输出与视觉待验。 |
 | [Day 11：Function / Tool Calling 运行机制](day-11-tool-calling.md) | JSONPlaceholder 示例任务统计工具；真实 HTTP 与 DeepSeek 回答已验，浏览器展示待验。 |
+| [Day 12：Zod 工具契约与描述设计](day-12-tool-contracts.md) | 订单编号、视图枚举、可选和可空字段；真实工具选择待验。 |
 | [L00：仓库体检与项目骨架](L00-repository-bootstrap.md) | 旧 16 课体系的历史课件，保留用于追溯。 |
 
 每个新课件必须包含本课目标/前置、概念与流程、具体文件和**可对照源码的重点代码片段及中文说明**、通用五坑、本课专项五坑、至少三道完整面试问答、实际测试和边界、可量化验收与证据、本课小结与复盘、Git commit 建议和下一课依赖。没有运行的测试标“未执行”。
