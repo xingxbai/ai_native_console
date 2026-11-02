@@ -1,0 +1,29 @@
+{
+  "source": "演示考勤数据，非真实员工记录",
+  "records": [
+    {
+      "employeeId": 1024,
+      "month": "2026-10",
+      "lateCount": 2,
+      "missingClockCount": 1
+    },
+    {
+      "employeeId": 1024,
+      "month": "2026-11",
+      "lateCount": 0,
+      "missingClockCount": 0
+    },
+    {
+      "employeeId": 2048,
+      "month": "2026-10",
+      "lateCount": 1,
+      "missingClockCount": 0
+    },
+    {
+      "employeeId": 3072,
+      "month": "2026-10",
+      "lateCount": 0,
+      "missingClockCount": 2
+    }
+  ]
+}

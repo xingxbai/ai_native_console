@@ -19,6 +19,8 @@ export const getOrderDetailInputSchema = z.strictObject({
   view: z.enum(["status", "detail"]).optional().describe("只问状态时选 status；需要订单详情时选 detail，省略时返回详情"),
 });
 
+
+
 export const getOrderDetailOutputSchema = z.strictObject({
   orderId: z.number().int().positive(),
   status: z.string(),
@@ -27,6 +29,19 @@ export const getOrderDetailOutputSchema = z.strictObject({
   refundReason: z.string().nullable().optional(),
 });
 
+// 工具参数，Deepseek会输出这个结构
+export const getAttendanceDetailsInputSchema = z.strictObject({
+  employeeId: z.number().int().positive().max(999_999).describe("要查询的员工编号，例如 123"),
+  view: z.enum(["status", "detail"]).optional().describe("只问状态时选 status；需要详情时选 detail，省略时返回详情"),
+  month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/)
+});
+
+export const getAttendanceDetailsOutputSchema = z.strictObject({
+  employeeId: z.number().int().positive(),
+  month: z.string().regex(/^\d{4}-\d{2}$/).describe("查询的月份，格式为 YYYY-MM，例如 2026-11"),
+  lateCount: z.number().int().nonnegative().describe("该员工在该月的迟到次数"),
+  missingClockCount: z.number().int().nonnegative().describe("该员工在该月的缺卡次数"),
+});
 export const analysisSchema = z.strictObject({
   summary: z.string().trim().min(1).max(500),
   risk: z.string().trim().min(1).max(500),

@@ -1,9 +1,17 @@
 import { createDeepSeek } from "@ai-sdk/deepseek";
 import { Output, stepCountIs, streamText, tool } from "ai";
-import { analysisSchema, getOrderDetailInputSchema, partialAnalysisSchema, visualSchema, type Analysis, type Visual } from "@ai-native-console/contracts";
+import {
+  analysisSchema,
+  getOrderDetailInputSchema,
+  partialAnalysisSchema,
+  visualSchema,
+  type Analysis,
+  type Visual,
+  getAttendanceDetailsInputSchema
+ } from "@ai-native-console/contracts";
 import { z } from "zod";
 import { getDemoTaskStats, getDemoUserInfo } from "./demo-stats.js";
-import { getOrderDetail, refundComparison } from "./order-demo.js";
+import { getOrderDetail, refundComparison, getAttendanceDetails } from "./order-demo.js";
 
 const promptSchema = z.string().trim().min(1).max(500);
 const instructionsSchema = z.string().trim().min(1).max(500);
@@ -144,6 +152,11 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
             description: "当用户询问某个演示订单的状态、客户、金额或退款原因时调用。必须提供订单编号；只问状态时 view 设为 status，否则可省略 view。仅查询本地演示数据，不适用于真实订单；查不到时明确说明不存在，不要编造。",
             inputSchema: getOrderDetailInputSchema,
             execute: async (input) => getOrderDetail(input, abortSignal),
+          }),
+          getAttendanceDetails: tool({
+            description: "当用户询问演示员工某个月的迟到或缺卡情况时调用。必须提供员工编号和月份，月份格式为 YYYY-MM；用户没说月份时先追问，不要猜测。只使用工具返回的该月记录；没有该月记录不能说员工不存在。",
+            inputSchema: getAttendanceDetailsInputSchema,
+            execute: async (input) => getAttendanceDetails(input, abortSignal),
           }),
         },
         // 最多一次工具调用，再让模型根据结果作答。
