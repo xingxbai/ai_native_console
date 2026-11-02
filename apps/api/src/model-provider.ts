@@ -3,6 +3,7 @@ import { Output, stepCountIs, streamText, tool } from "ai";
 import { analysisSchema, partialAnalysisSchema, visualSchema, type Analysis, type Visual } from "@ai-native-console/contracts";
 import { z } from "zod";
 import { getDemoTaskStats, getDemoUserInfo } from "./demo-stats.js";
+import { refundComparison } from "./order-demo.js";
 
 const promptSchema = z.string().trim().min(1).max(500);
 const instructionsSchema = z.string().trim().min(1).max(500);
@@ -120,7 +121,7 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
         ...requestOptions(instructions, prompt, abortSignal),
         tools: {
           getDemoTaskStats: tool({
-            description: "Fetch the public JSONPlaceholder demo API with userId=1 fixed in the URL. Return only that user's total, completed, and pending task counts. Use for questions about demo user 1 task statistics. These are sample data, not real business metrics.",
+            description: "当用户询问演示用户 1 的任务完成统计时调用。读取 JSONPlaceholder 公共演示接口，只返回任务总数、已完成数和未完成数。数据仅用于演示，不是真实业务指标。",
             inputSchema: z.strictObject({}),
             // 模型只提出调用；Node 服务端实际请求公网示例接口。
             execute: async () => getDemoTaskStats(abortSignal),
@@ -132,7 +133,13 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
             execute: async () => {
               return getDemoUserInfo(abortSignal);
             }
-          })
+          }),
+          getRefundComparison: tool({
+            description: "当用户询问这周退款为什么变多、两周退款数量变化或本周退款原因时调用。返回固定日期演示订单的本周和上周退款笔数，以及本周原因分布。只可据此说明数量变化和本周分布，不能断言增长原因；缺少上周原因分布和订单总量。",
+            inputSchema: z.strictObject({}),
+            // 业务模块负责读数和统计；模型只接收汇总结果用于解释。
+            execute: async () => refundComparison(abortSignal),
+          }),
         },
         // 最多一次工具调用，再让模型根据结果作答。
         stopWhen: stepCountIs(2),

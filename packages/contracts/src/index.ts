@@ -33,6 +33,7 @@ export const streamEventSchema = z.discriminatedUnion("type", [
     requestId: requestIdSchema,
     provider: z.enum(["deepseek", "local"]),
     model: z.string().min(1),
+    display: z.enum(["json", "markdown"]).optional(),
     format: z.enum(["text", "analysis", "visual", "tool"]),
   }),
   z.strictObject({ type: z.literal("delta"), text: z.string().min(1) }),

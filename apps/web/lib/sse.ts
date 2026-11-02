@@ -72,7 +72,7 @@ export async function readStreamReply(
   format: "text" | "analysis" | "visual" | "tool",
   onDelta: (content: string) => void,
   onPartial: (value: Partial<Analysis>) => void,
-  onStart: (provider: "deepseek" | "local") => void,
+  onStart: (provider: "deepseek" | "local", display?: "json" | "markdown") => void,
 ) {
   if (!response.body || !response.headers.get("content-type")?.startsWith("text/event-stream")) {
     throw new Error("Invalid stream response");
@@ -101,7 +101,7 @@ export async function readStreamReply(
             throw new Error("Invalid SSE start event");
           }
           start = event;
-          onStart(event.provider);
+          onStart(event.provider, event.display);
         } else if (!start || completed) {
           throw new Error("Unexpected SSE event");
         } else if (event.type === "delta") {

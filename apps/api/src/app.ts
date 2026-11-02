@@ -16,7 +16,7 @@ import { findDirectTool } from "./direct-tools.js";
 const SYSTEM_INSTRUCTIONS = "Answer in the user's language, briefly and directly. Use at most three short paragraphs or bullets. Do not claim access to business data or tools.";
 const ANALYSIS_INSTRUCTIONS = "Analyze the user's engineering question in their language. Give a concise summary, one concrete risk, and one actionable next step. Do not claim access to business data or tools.";
 const VISUAL_INSTRUCTIONS = "Return one UI data object. Choose kpi for one number, table for comparison, or bar for a numeric comparison. Use short labels and at most eight rows. User-provided numbers are illustrative only; never invent business facts or claim access to live data.";
-const TOOL_INSTRUCTIONS = "Answer in the user's language. For questions about the demo task completion statistics, use the getDemoTaskStats tool. Clearly state that these are public sample data, not real business metrics. For unrelated questions, answer directly.使用getDemoUserInfo工具获取当前用户的个人信息。不要编造业务数据或声称访问实时数据。";
+const TOOL_INSTRUCTIONS = "用用户的语言回答。询问演示任务统计时调用 getDemoTaskStats；询问当前用户信息时调用 getDemoUserInfo；询问本周退款数量及原因时调用 getRefundComparison。退款工具只提供两周数量和本周原因分布，不能据此断言退款增长的因果原因，还需要上周原因和订单总量。所有工具数据均为演示数据，不是真实业务指标；不要编造缺失数据。其他问题直接回答。";
 
 class ApiError extends Error {
   constructor(readonly code: ApiErrorCode, readonly statusCode: number, message: string) {
@@ -96,11 +96,11 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
       let sequence = 0;
       const frame = (event: StreamEvent) => sseFrame(`${requestId}:${++sequence}`, event);
       yield ": connected\n\n";
-      yield frame({ type: "start", requestId, provider: directTool ? "local" : "deepseek", model: directTool?.name ?? provider!.model, format });
+      yield frame({ type: "start", requestId, provider: directTool ? "local" : "deepseek", model: directTool?.name ?? provider!.model, display: directTool?.display, format });
       try {
         if (directTool) {
           // 注册表中的工具直接产出文本流，SSE 层只负责转发。
-          for await (const text of directTool.stream(controller.signal)) yield frame({ type: "delta", text });
+          for await (const text of directTool.stream(message, controller.signal)) yield frame({ type: "delta", text });
           if (!controller.signal.aborted) yield frame({ type: "done", requestId });
         } else if (format === "tool") {
           for await (const text of provider!.streamToolReply(TOOL_INSTRUCTIONS, message, controller.signal)) {

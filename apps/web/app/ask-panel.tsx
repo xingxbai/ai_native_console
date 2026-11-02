@@ -7,7 +7,16 @@ import { MarkdownReply } from "./markdown-reply";
 import { VisualReply } from "./visual-reply";
 
 type Mode = "text" | "analysis" | "visual" | "tool";
-type Exchange = { id: number; question: string; mode: Mode; status: "loading" | "streaming" | "complete" | "cancelled" | "error"; content: string; source?: "deepseek" | "local"; partial?: Partial<Analysis>; analysis?: Analysis; visual?: Visual; error?: string; requestId?: string };
+type Exchange = { id: number; question: string; mode: Mode; status: "loading" | "streaming" | "complete" | "cancelled" | "error"; content: string; source?: "deepseek" | "local"; display?: "json" | "markdown"; partial?: Partial<Analysis>; analysis?: Analysis; visual?: Visual; error?: string; requestId?: string };
+
+const demoQuestions = [
+  "返回订单 123 的完整数据",
+  "订单 123 现在是什么状态？",
+  "统计今天有多少笔退款",
+  "列出退款金额最高的 10 笔订单",
+  "把这份 JSON 转成表格",
+  "这周退款为什么变多了？",
+] as const;
 
 const errorMessages: Record<string, string> = {
   BAD_REQUEST: "请求格式不正确，请重试。",
@@ -94,7 +103,7 @@ export function AskPanel() {
           if (frame === undefined) frame = requestAnimationFrame(flush);
         },
         (partial) => { if (!controller.signal.aborted) updateExchange(id, { status: "streaming", partial }); },
-        (source) => { if (!controller.signal.aborted) updateExchange(id, { source }); },
+        (source, display) => { if (!controller.signal.aborted) updateExchange(id, { source, display }); },
       );
       if (!controller.signal.aborted) {
         // done 自带完整正文，直接取消待绘制帧即可。
@@ -139,6 +148,12 @@ export function AskPanel() {
         ))}
       </div>
       <form onSubmit={submit} className="space-y-3">
+        <label htmlFor="demo-question" className="block text-sm font-medium">订单场景示例</label>
+        <select id="demo-question" value="" disabled={busy} onChange={(event) => { setMessage(event.target.value); setMode("tool"); }}
+          className="w-full rounded-md border border-[#bdcbd0] bg-white px-3 py-2 text-sm">
+          <option value="">选择一个问题</option>
+          {demoQuestions.map((question) => <option key={question} value={question}>{question}</option>)}
+        </select>
         <label htmlFor="question" className="block text-sm font-medium">问题</label>
         <textarea
           id="question"
@@ -151,7 +166,7 @@ export function AskPanel() {
           className="w-full resize-y rounded-md border border-[#bdcbd0] bg-white px-3 py-2 text-sm leading-6 outline-none focus:border-[#207a74] focus:ring-2 focus:ring-[#d2eae5]"
         />
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs text-[#65747a]">{message.length}/500 · 每次提问单独计费</span>
+          <span className="text-xs text-[#65747a]">{message.length}/500 · 模型问答可能产生费用</span>
           <button
             type="submit"
             disabled={!message.trim() || busy}
@@ -172,7 +187,7 @@ export function AskPanel() {
             <p className="text-xs font-medium text-[#65747a]">问题</p>
             <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">{item.question}</p>
             <p className="mt-3 text-xs font-medium text-[#527c7e]">{item.source === "local" ? "本地数据" : "DeepSeek"} · {{ text: "文本问答", analysis: "结构化分析", visual: "可视化", tool: "工具问答" }[item.mode]} · {{ loading: "等待回复", streaming: "正在回复", complete: "已完成", cancelled: "已停止", error: "回复失败" }[item.status]}</p>
-            {item.content && (item.source === "local"
+            {item.content && (item.display === "json"
               ? <pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap break-all rounded border border-[#dbe2e5] bg-[#f7f9f9] p-3 text-xs">{item.content}</pre>
               : <MarkdownReply content={item.content} streaming={item.status === "streaming"} />)}
             {item.source !== "local" && item.mode === "visual" && (item.status === "loading" || item.status === "streaming") && <div className="mt-3 h-96 animate-pulse border-t border-[#dbe2e5] bg-[#f1f5f4]" aria-label="正在生成可视化" />}

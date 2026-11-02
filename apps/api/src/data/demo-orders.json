@@ -1,0 +1,23 @@
+{
+  "asOfDate": "2026-10-30",
+  "currentWeek": "2026-10-26 至 2026-11-01",
+  "previousWeek": "2026-10-19 至 2026-10-25",
+  "currentWeekStart": "2026-10-26",
+  "currentWeekEnd": "2026-11-01",
+  "previousWeekStart": "2026-10-19",
+  "previousWeekEnd": "2026-10-25",
+  "orders": [
+    { "id": 123, "customer": "张女士", "status": "已退款", "amount": 899, "refundAmount": 899, "refundDate": "2026-10-30", "refundReason": "发货延迟" },
+    { "id": 124, "customer": "李先生", "status": "待退款", "amount": 1299, "refundAmount": 0, "refundDate": null, "refundReason": "商品瑕疵" },
+    { "id": 125, "customer": "王女士", "status": "已退款", "amount": 399, "refundAmount": 399, "refundDate": "2026-10-30", "refundReason": "发货延迟" },
+    { "id": 126, "customer": "陈先生", "status": "已退款", "amount": 129, "refundAmount": 129, "refundDate": "2026-10-29", "refundReason": "不想要了" },
+    { "id": 127, "customer": "赵女士", "status": "已退款", "amount": 699, "refundAmount": 699, "refundDate": "2026-10-28", "refundReason": "发货延迟" },
+    { "id": 128, "customer": "刘先生", "status": "已退款", "amount": 259, "refundAmount": 259, "refundDate": "2026-10-27", "refundReason": "商品瑕疵" },
+    { "id": 129, "customer": "孙女士", "status": "已退款", "amount": 99, "refundAmount": 99, "refundDate": "2026-10-26", "refundReason": "发货延迟" },
+    { "id": 130, "customer": "周先生", "status": "已退款", "amount": 499, "refundAmount": 499, "refundDate": "2026-10-24", "refundReason": "不想要了" },
+    { "id": 131, "customer": "吴女士", "status": "已退款", "amount": 188, "refundAmount": 188, "refundDate": "2026-10-22", "refundReason": "商品瑕疵" },
+    { "id": 132, "customer": "郑先生", "status": "已退款", "amount": 79, "refundAmount": 79, "refundDate": "2026-10-20", "refundReason": "不想要了" },
+    { "id": 133, "customer": "林女士", "status": "已完成", "amount": 349, "refundAmount": 0, "refundDate": null, "refundReason": null },
+    { "id": 134, "customer": "黄先生", "status": "待退款", "amount": 559, "refundAmount": 0, "refundDate": null, "refundReason": "发货延迟" }
+  ]
+}

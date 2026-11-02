@@ -92,6 +92,23 @@ SDK 最多运行两步：第一步可调用工具，第二步禁用工具并回�
 
 本轮无服务 SSE 检查：HTTP 200、`provider=local`、92 个 `delta`、751,554 字节，重组后与磁盘文件逐字一致，末尾为 `done`。`pnpm lint`、`pnpm -r typecheck`、`pnpm -r test`（API 15/15、Web 6/6）和 `git diff --check` 均 exit 0；没有启动项目、运行 build 或做浏览器验收。手动验证时，在任意回答模式输入该固定指令，Network 中确认 `start` 标明 `local`，页面持续显示原始 JSON，并与文件首尾字段核对。
 
+### 六个订单场景练习
+
+`apps/api/src/data/demo-orders.json` 是固定日期 **2026-10-30** 的演示数据，模拟后端订单 API 的返回；它不代表真实业务和系统当前日期。页面“订单场景示例”下拉框可依次填入六个问题。前五个在 `direct-tools.ts` 中匹配并由 Node 读取、计算或排序；第六个由 DeepSeek 调用 `getRefundComparison`，`order-demo.ts` 计算后只向模型返回小型汇总。通用 SSE 路由不识别具体退款问题。
+
+| 输入 | 预期观察 | 数据走向 |
+| --- | --- | --- |
+| 返回订单 123 的完整数据 | 原始 JSON，状态“已退款”、金额 899 | JSON 文件 → Node → SSE |
+| 订单 123 现在是什么状态？ | “已退款” | JSON 文件 → Node 提取字段 → SSE |
+| 统计今天有多少笔退款 | 演示日期 2026-10-30 有 2 笔 | JSON 文件 → Node 计数 → SSE |
+| 列出退款金额最高的 10 笔订单 | Markdown 表格，首位订单 123、退款 899 元 | JSON 文件 → Node 排序 → SSE |
+| 把这份 JSON 转成表格 | 12 行演示订单的 Markdown 表格 | JSON 文件 → Node 表格化 → SSE |
+| 这周退款为什么变多了？ | 模型解释本周 6 笔、上周 3 笔；不应把原因分布说成已证实的增长原因 | JSON 文件 → Node 汇总 → DeepSeek → SSE |
+
+重点代码：`direct-tools.ts` 的 `DirectTool` 登记确定性查询；`order-demo.ts` 负责读取校验和退款统计；`model-provider.ts` 注册 `getRefundComparison`，由模型决定是否调用，再基于工具汇总回答；`app.ts` 只处理通用流转；`ask-panel.tsx` 用 SSE `start.display` 决定展示 JSON 原文还是 Markdown。这里的“今天”和“这周”是演示数据中的固定时间窗口；真实项目应由请求日期、时区和后端统计口径共同决定。任意 JSON 上传和通用 JSON 转表格尚未实现，第五条只转换这份演示订单 JSON。
+
+此前无服务 SSE 检查逐一验证前五条为 HTTP 200、`provider=local`、`done`，核对了返回内容；第六条业务模块汇总为本周 6 笔、上周 3 笔。工具层调整后的静态检查和现有测试结果以最新执行记录为准；**尚未实际调用 DeepSeek**。没有启动项目、运行 build 或做浏览器验收；页面下拉框、表格渲染及真实模型回复需手动复验。
+
 复盘：1. 模型、Node、JSONPlaceholder 各负责什么？2. 为什么“数字吻合”还需要出站请求证据？3. 换成真实统计系统后，身份、租户和统计口径该在哪层检查？
 
 Git 建议只提交本课服务端工具、协议精简、课件和进度，不提交密钥。Day 12 再展开工具参数契约，本轮停在 Day 11。
