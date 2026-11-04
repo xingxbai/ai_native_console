@@ -84,6 +84,10 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
 
     const requestId = request.id;
     const message = input.data.message;
+    // 页面上下文只是定位线索，不能代替服务端的工具鉴权或查询结果。
+    const toolInstructions = input.data.context?.selectedOrderId
+      ? `${TOOL_INSTRUCTIONS} 当前页面选中演示订单 ${input.data.context.selectedOrderId}；若用户说“这条订单”，先用工具查询该编号。`
+      : TOOL_INSTRUCTIONS;
     const format = input.data.format ?? "text";
     const provider = modelProvider;
     const controller = new AbortController();
@@ -104,7 +108,7 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
           for await (const text of directTool.stream(message, controller.signal)) yield frame({ type: "delta", text });
           if (!controller.signal.aborted) yield frame({ type: "done", requestId });
         } else if (format === "tool") {
-          for await (const text of provider!.streamToolReply(TOOL_INSTRUCTIONS, message, controller.signal)) {
+          for await (const text of provider!.streamToolReply(toolInstructions, message, controller.signal)) {
             yield frame({ type: "delta", text });
           }
           if (!controller.signal.aborted) yield frame({ type: "done", requestId });

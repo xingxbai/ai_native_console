@@ -11,6 +11,11 @@ export const healthResponseSchema = z.strictObject({
 export const chatRequestSchema = z.strictObject({
   message: z.string().trim().min(1).max(500),
   format: z.enum(["text", "analysis", "visual", "tool"]).optional(),
+  context: z.strictObject({
+    route: z.literal("/"),
+    selectedOrderId: z.enum(["123", "124", "133"]).optional(),
+    statusFilter: z.enum(["all", "refunded", "pending", "completed"]),
+  }).optional(),
 });
 
 // 工具参数只表达查询意图；是否有权查询该订单须由服务端另行判断。

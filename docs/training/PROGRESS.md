@@ -1,6 +1,6 @@
 # 学习进度
 
-更新日期：2026-11-04。**Day 01–06 已完成；Day 07–15 进行中，部分运行时与视觉验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
+更新日期：2026-11-04。**Day 01–06 已完成；Day 07–16 进行中，部分运行时与视觉验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
 
 当前练习主线：主页输入面试题或真实工程情境，DeepSeek 提供流式回复；Day 11 增加只读的公网演示统计 API 工具，以及六个基于本地演示订单 JSON 的查询、计算、表格和模型解释场景。没有真实订单系统、文档检索或审批执行。[README](../../README.md)说明现行操作，[面试题库](interview-question-bank.md)区分已实现与待实现。
 
@@ -21,7 +21,7 @@
 | 13 工具注册、服务端执行与权限边界 | IN_PROGRESS | [Day 13 课件](lessons/day-13-tool-registration-permissions.md)：受保护 AI 工具注册表与固定演示身份；未知工具、越权、只读角色无服务检查通过；真实登录态/模型待验。 |
 | 14 参数校验失败与有界自纠错 | IN_PROGRESS | [Day 14 课件](lessons/day-14-bounded-tool-repair.md)：订单 view 错误最多一次修复；资格检查、lint/typecheck、现有测试通过；真实 DeepSeek 修复待验。 |
 | 15 工具异常、超时、重试与幂等 | IN_PROGRESS | [Day 15 课件](lessons/day-15-tool-execution-reliability.md)：只读 GET 有界重试与工具错误码；公网正常/404/503、取消已执行，精确重试次数和浏览器待验。 |
-| 16 前端 ContextCollector | NOT_STARTED | - |
+| 16 前端 ContextCollector | IN_PROGRESS | [Day 16 课件](lessons/day-16-frontend-context-collector.md)：首页订单选择、白名单采集、双边请求校验与工具定位指令；合法/敏感字段/路由契约操作已验，浏览器与真实模型待验。 |
 | 17 Token 预算与上下文裁剪 | NOT_STARTED | - |
 | 18 Sliding Window 与 Summary Memory | NOT_STARTED | - |
 | 19 Prompt Injection 与数据最小化 | NOT_STARTED | - |

@@ -5,6 +5,7 @@ import { apiErrorResponseSchema, type Analysis, type Visual } from "@ai-native-c
 import { readStreamReply, StreamReplyError } from "../lib/sse";
 import { MarkdownReply } from "./markdown-reply";
 import { VisualReply } from "./visual-reply";
+import { collectPageContext } from "../lib/context-collector";
 
 type Mode = "text" | "analysis" | "visual" | "tool";
 type Exchange = { id: number; question: string; mode: Mode; status: "loading" | "streaming" | "complete" | "cancelled" | "error"; content: string; source?: "deepseek" | "local"; display?: "json" | "markdown"; partial?: Partial<Analysis>; analysis?: Analysis; visual?: Visual; error?: string; requestId?: string };
@@ -17,6 +18,12 @@ const demoQuestions = [
   "把这份 JSON 转成表格",
   "这周退款为什么变多了？",
   "请查询演示订单 124 的退款原因",
+] as const;
+
+const orderRows = [
+  { id: "123", status: "refunded", label: "123 · 已退款" },
+  { id: "124", status: "pending", label: "124 · 待退款" },
+  { id: "133", status: "completed", label: "133 · 已完成" },
 ] as const;
 
 const errorMessages: Record<string, string> = {
@@ -34,6 +41,8 @@ const errorMessages: Record<string, string> = {
 export function AskPanel() {
   const [message, setMessage] = useState("");
   const [mode, setMode] = useState<Mode>("text");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedOrderId, setSelectedOrderId] = useState("");
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
   const [busy, setBusy] = useState(false);
   const nextId = useRef(0);
@@ -58,6 +67,7 @@ export function AskPanel() {
     event.preventDefault();
     const input = message.trim();
     if (!input || input.length > 500 || busy) return;
+    const context = collectPageContext({ route: window.location.pathname, selectedOrderId, statusFilter });
 
     const id = ++nextId.current;
     const controller = new AbortController();
@@ -80,7 +90,7 @@ export function AskPanel() {
       const response = await fetch("/api/chat/stream", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ message: input, format: mode }),
+        body: JSON.stringify({ message: input, format: mode, context }),
         signal: controller.signal,
       });
       if (controller.signal.aborted) return;
@@ -151,6 +161,19 @@ export function AskPanel() {
         ))}
       </div>
       <form onSubmit={submit} className="space-y-3">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="text-sm">订单状态
+            <select value={statusFilter} disabled={busy} onChange={(event) => { setStatusFilter(event.target.value); setSelectedOrderId(""); }} className="mt-1 block w-full rounded-md border border-[#bdcbd0] bg-white px-3 py-2">
+              <option value="all">全部</option><option value="refunded">已退款</option><option value="pending">待退款</option><option value="completed">已完成</option>
+            </select>
+          </label>
+          <label className="text-sm">当前订单
+            <select value={selectedOrderId} disabled={busy} onChange={(event) => setSelectedOrderId(event.target.value)} className="mt-1 block w-full rounded-md border border-[#bdcbd0] bg-white px-3 py-2">
+              <option value="">未选择</option>
+              {orderRows.filter((row) => statusFilter === "all" || row.status === statusFilter).map((row) => <option key={row.id} value={row.id}>{row.label}</option>)}
+            </select>
+          </label>
+        </div>
         <label htmlFor="demo-question" className="block text-sm font-medium">订单场景示例</label>
         <select id="demo-question" value="" disabled={busy} onChange={(event) => { setMessage(event.target.value); setMode("tool"); }}
           className="w-full rounded-md border border-[#bdcbd0] bg-white px-3 py-2 text-sm">
