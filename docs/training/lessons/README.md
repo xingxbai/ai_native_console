@@ -19,6 +19,7 @@
 | [Day 11：Function / Tool Calling 运行机制](day-11-tool-calling.md) | JSONPlaceholder 示例任务统计工具；真实 HTTP 与 DeepSeek 回答已验，浏览器展示待验。 |
 | [Day 12：Zod 工具契约与描述设计](day-12-tool-contracts.md) | 订单编号、视图枚举、可选和可空字段；真实工具选择待验。 |
 | [Day 13：工具注册、服务端执行与权限边界](day-13-tool-registration-permissions.md) | 受保护工具白名单、演示身份范围和越权拒绝；真实登录态待接入。 |
+| [Day 14：参数校验失败与有界自纠错](day-14-bounded-tool-repair.md) | 订单 view 错误至多修一次；缺字段和权限拒绝停止。 |
 | [L00：仓库体检与项目骨架](L00-repository-bootstrap.md) | 旧 16 课体系的历史课件，保留用于追溯。 |
 
 每个新课件必须包含本课目标/前置、概念与流程、具体文件和**可对照源码的重点代码片段及中文说明**、通用五坑、本课专项五坑、至少三道完整面试问答、实际测试和边界、可量化验收与证据、本课小结与复盘、Git commit 建议和下一课依赖。没有运行的测试标“未执行”。

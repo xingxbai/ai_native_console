@@ -1,5 +1,5 @@
 import { createDeepSeek } from "@ai-sdk/deepseek";
-import { Output, stepCountIs, streamText, tool } from "ai";
+import { generateText, InvalidToolInputError, NoSuchToolError, Output, stepCountIs, streamText, tool } from "ai";
 import {
   analysisSchema,
   getOrderDetailInputSchema,
@@ -13,6 +13,7 @@ import { z } from "zod";
 import { getDemoTaskStats, getDemoUserInfo } from "./demo-stats.js";
 import { refundComparison } from "./order-demo.js";
 import { demoActor, executeRegisteredTool, ToolAccessError } from "./tool-registry.js";
+import { repairableOrderId } from "./tool-repair.js";
 
 const promptSchema = z.string().trim().min(1).max(500);
 const instructionsSchema = z.string().trim().min(1).max(500);
@@ -125,6 +126,7 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
     // 外部 HTTP 加两轮模型调用可能超过普通问答的 20 秒，单独给工具模式 40 秒。
     const timeoutSignal = AbortSignal.timeout(40_000);
     const abortSignal = AbortSignal.any([signal, timeoutSignal]);
+    let repairAttempts = 0;
     try {
       const result = streamText({
         ...requestOptions(instructions, prompt, abortSignal),
@@ -163,6 +165,22 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
         // 最多一次工具调用，再让模型根据结果作答。
         stopWhen: stepCountIs(2),
         prepareStep: ({ stepNumber }) => stepNumber === 0 ? {} : { activeTools: [] },
+        repairToolCall: async ({ toolCall, error }) => {
+          // 只修复订单详情的可选视图；缺编号、未知工具和权限拒绝都不能靠模型补造。
+          if (!InvalidToolInputError.isInstance(error)) return null;
+          const orderId = repairableOrderId(toolCall.toolName, toolCall.input, repairAttempts);
+          if (orderId === undefined) return null;
+          repairAttempts++;
+          const repaired = await generateText({
+            ...requestOptions("仅修复工具参数中的 view。保留原订单号；只输出合法对象。", prompt, abortSignal),
+            output: Output.object({ schema: getOrderDetailInputSchema }),
+            maxOutputTokens: 128,
+            prompt: `用户问题：${prompt}。原参数：${toolCall.input}。只把 view 改为 status、detail 或省略；orderId 必须保持 ${orderId}。`,
+          });
+          const args = getOrderDetailInputSchema.safeParse(repaired.output);
+          if (!args.success || args.data.orderId !== orderId) return null;
+          return { ...toolCall, input: JSON.stringify(args.data) };
+        },
       });
       let length = 0;
       for await (const part of result.fullStream) {
@@ -172,9 +190,25 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
             yield part.error.message;
             return;
           }
+          if (InvalidToolInputError.isInstance(part.error)) {
+            yield "工具参数无效，请提供明确的订单编号或查询范围。";
+            return;
+          }
+          if (NoSuchToolError.isInstance(part.error)) {
+            yield "工具未注册，无法执行该请求。";
+            return;
+          }
           throw part.error;
         } else if (part.type === "error") {
           // SDK 将连接失败放进流事件；必须作为模型故障上报，不能误判成输出截断。
+          if (NoSuchToolError.isInstance(part.error)) {
+            yield "工具未注册，无法执行该请求。";
+            return;
+          }
+          if (InvalidToolInputError.isInstance(part.error)) {
+            yield "工具参数无效，请提供明确的订单编号或查询范围。";
+            return;
+          }
           throw part.error;
         } else if (part.type === "text-delta" && part.text) {
           length += part.text.length;
