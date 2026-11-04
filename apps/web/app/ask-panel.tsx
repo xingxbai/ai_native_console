@@ -25,6 +25,8 @@ const errorMessages: Record<string, string> = {
   MODEL_TIMEOUT: "回复超时，请稍后重试。",
   MODEL_UNAVAILABLE: "模型暂时不可用，请稍后重试。",
   MODEL_INVALID_RESPONSE: "回复格式异常，请稍后重试。",
+  TOOL_TIMEOUT: "数据查询超时，请稍后重试。",
+  TOOL_UNAVAILABLE: "数据服务暂时不可用，请稍后重试。",
   INTERNAL_ERROR: "服务暂时不可用，请稍后重试。",
   NOT_FOUND: "问答服务暂时不可用。",
 };

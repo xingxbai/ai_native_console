@@ -12,6 +12,7 @@ import {
 } from "@ai-native-console/contracts";
 import { ModelOutputLimitError, ModelTimeoutError, type ModelProvider } from "./model-provider.js";
 import { findDirectTool } from "./direct-tools.js";
+import { ToolExecutionError } from "./tool-execution.js";
 
 const SYSTEM_INSTRUCTIONS = "Answer in the user's language, briefly and directly. Use at most three short paragraphs or bullets. Do not claim access to business data or tools.";
 const ANALYSIS_INSTRUCTIONS = "Analyze the user's engineering question in their language. Give a concise summary, one concrete risk, and one actionable next step. Do not claim access to business data or tools.";
@@ -123,7 +124,8 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
         }
       } catch (error) {
         if (controller.signal.aborted) return;
-        const code = error instanceof ModelTimeoutError ? "MODEL_TIMEOUT"
+        const code = error instanceof ToolExecutionError ? error.code
+          : error instanceof ModelTimeoutError ? "MODEL_TIMEOUT"
           : error instanceof ModelOutputLimitError ? "MODEL_INVALID_RESPONSE" : "MODEL_UNAVAILABLE";
         // 开发时保留异常堆栈便于定位；生产日志只记错误类型，避免泄露工具返回的数据。
         request.log.error({ requestId, format, ...(process.env.NODE_ENV === "production"

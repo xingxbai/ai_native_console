@@ -72,7 +72,7 @@ export const streamEventSchema = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("visual_done"), value: visualSchema, requestId: requestIdSchema }),
   z.strictObject({
     type: z.literal("error"),
-    code: z.enum(["MODEL_TIMEOUT", "MODEL_UNAVAILABLE", "MODEL_INVALID_RESPONSE"]),
+    code: z.enum(["MODEL_TIMEOUT", "MODEL_UNAVAILABLE", "MODEL_INVALID_RESPONSE", "TOOL_TIMEOUT", "TOOL_UNAVAILABLE"]),
     message: z.string(),
     requestId: requestIdSchema,
   }),
@@ -86,6 +86,8 @@ export const apiErrorCodeSchema = z.enum([
   "MODEL_TIMEOUT",
   "MODEL_UNAVAILABLE",
   "MODEL_INVALID_RESPONSE",
+  "TOOL_TIMEOUT",
+  "TOOL_UNAVAILABLE",
 ]);
 
 export const apiErrorResponseSchema = z.strictObject({

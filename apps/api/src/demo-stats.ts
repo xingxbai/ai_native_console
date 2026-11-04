@@ -2,6 +2,7 @@ import { z } from "zod";
 import { readFile } from "node:fs/promises";
 import { createReadStream } from "node:fs";
 import { StringDecoder } from "node:string_decoder";
+import { fetchReadOnlyJson } from "./tool-execution.js";
 const tasksSchema = z.array(z.object({
   userId: z.literal(1),
   completed: z.boolean(),
@@ -9,9 +10,7 @@ const tasksSchema = z.array(z.object({
 
 export async function getDemoTaskStats(signal: AbortSignal) {
   // 公网演示接口只读；Node 端完成统计，只把汇总数字交给模型。
-  const response = await fetch("https://jsonplaceholder.typicode.com/todos?userId=1", { signal });
-  if (!response.ok) throw new Error(`Demo statistics API returned ${response.status}`);
-  const tasks = tasksSchema.parse(await response.json());
+  const tasks = tasksSchema.parse(await fetchReadOnlyJson("https://jsonplaceholder.typicode.com/todos?userId=1", signal));
   const completed = tasks.filter((task) => task.completed).length;
   return { total: tasks.length, completed, pending: tasks.length - completed };
 }
