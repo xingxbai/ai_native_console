@@ -22,7 +22,7 @@
 | 14 参数校验失败与有界自纠错 | IN_PROGRESS | [Day 14 课件](lessons/day-14-bounded-tool-repair.md)：订单 view 错误最多一次修复；资格检查、lint/typecheck、现有测试通过；真实 DeepSeek 修复待验。 |
 | 15 工具异常、超时、重试与幂等 | IN_PROGRESS | [Day 15 课件](lessons/day-15-tool-execution-reliability.md)：只读 GET 有界重试与工具错误码；公网正常/404/503、取消已执行，精确重试次数和浏览器待验。 |
 | 16 前端 ContextCollector | IN_PROGRESS | [Day 16 课件](lessons/day-16-frontend-context-collector.md)：首页订单选择、白名单采集、双边请求校验与工具定位指令；合法/敏感字段/路由契约操作已验，浏览器与真实模型待验。 |
-| 17 Token 预算与上下文裁剪 | NOT_STARTED | - |
+| 17 Token 预算与上下文裁剪 | IN_PROGRESS | [Day 17 课件](lessons/day-17-token-budget.md)：工具模式的文本粗估、先裁筛选再裁选中 ID、核心超预算拒绝；分级操作已验，真实 usage 和模型效果待验。 |
 | 18 Sliding Window 与 Summary Memory | NOT_STARTED | - |
 | 19 Prompt Injection 与数据最小化 | NOT_STARTED | - |
 | 20 会话隔离、并发与重复请求 | NOT_STARTED | - |

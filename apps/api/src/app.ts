@@ -13,6 +13,7 @@ import {
 import { ModelOutputLimitError, ModelTimeoutError, type ModelProvider } from "./model-provider.js";
 import { findDirectTool } from "./direct-tools.js";
 import { ToolExecutionError } from "./tool-execution.js";
+import { assembleToolInstructions, toolBudget } from "./context-budget.js";
 
 const SYSTEM_INSTRUCTIONS = "Answer in the user's language, briefly and directly. Use at most three short paragraphs or bullets. Do not claim access to business data or tools.";
 const ANALYSIS_INSTRUCTIONS = "Analyze the user's engineering question in their language. Give a concise summary, one concrete risk, and one actionable next step. Do not claim access to business data or tools.";
@@ -84,10 +85,13 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
 
     const requestId = request.id;
     const message = input.data.message;
-    // 页面上下文只是定位线索，不能代替服务端的工具鉴权或查询结果。
-    const toolInstructions = input.data.context?.selectedOrderId
-      ? `${TOOL_INSTRUCTIONS} 当前页面选中演示订单 ${input.data.context.selectedOrderId}；若用户说“这条订单”，先用工具查询该编号。`
-      : TOOL_INSTRUCTIONS;
+    // 页面线索只在工具模式进入模型；预算估算不包含 SDK 工具 Schema 开销。
+    const toolContext = input.data.format === "tool"
+      ? assembleToolInstructions(TOOL_INSTRUCTIONS, message, input.data.context)
+      : undefined;
+    if (toolContext?.overBudget) throw new ApiError("VALIDATION_ERROR", 400, "Question exceeds tool context budget");
+    if (toolContext) request.log.info({ requestId, estimatedInputTokens: toolContext.estimatedInputTokens,
+      inputBudget: toolBudget.input, outputReserve: toolBudget.outputReserve, omitted: toolContext.omitted }, "tool context budget");
     const format = input.data.format ?? "text";
     const provider = modelProvider;
     const controller = new AbortController();
@@ -108,7 +112,7 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
           for await (const text of directTool.stream(message, controller.signal)) yield frame({ type: "delta", text });
           if (!controller.signal.aborted) yield frame({ type: "done", requestId });
         } else if (format === "tool") {
-          for await (const text of provider!.streamToolReply(toolInstructions, message, controller.signal)) {
+          for await (const text of provider!.streamToolReply(toolContext!.instructions, message, controller.signal)) {
             yield frame({ type: "delta", text });
           }
           if (!controller.signal.aborted) yield frame({ type: "done", requestId });
