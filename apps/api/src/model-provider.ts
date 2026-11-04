@@ -11,7 +11,8 @@ import {
  } from "@ai-native-console/contracts";
 import { z } from "zod";
 import { getDemoTaskStats, getDemoUserInfo } from "./demo-stats.js";
-import { getOrderDetail, refundComparison, getAttendanceDetails } from "./order-demo.js";
+import { refundComparison } from "./order-demo.js";
+import { demoActor, executeRegisteredTool, ToolAccessError } from "./tool-registry.js";
 
 const promptSchema = z.string().trim().min(1).max(500);
 const instructionsSchema = z.string().trim().min(1).max(500);
@@ -151,12 +152,12 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
           getOrderDetail: tool({
             description: "当用户询问某个演示订单的状态、客户、金额或退款原因时调用。必须提供订单编号；只问状态时 view 设为 status，否则可省略 view。仅查询本地演示数据，不适用于真实订单；查不到时明确说明不存在，不要编造。",
             inputSchema: getOrderDetailInputSchema,
-            execute: async (input) => getOrderDetail(input, abortSignal),
+            execute: async (input) => executeRegisteredTool("getOrderDetail", input, demoActor, abortSignal),
           }),
           getAttendanceDetails: tool({
             description: "当用户询问演示员工某个月的迟到或缺卡情况时调用。必须提供员工编号和月份，月份格式为 YYYY-MM；用户没说月份时先追问，不要猜测。只使用工具返回的该月记录；没有该月记录不能说员工不存在。",
             inputSchema: getAttendanceDetailsInputSchema,
-            execute: async (input) => getAttendanceDetails(input, abortSignal),
+            execute: async (input) => executeRegisteredTool("getAttendanceDetails", input, demoActor, abortSignal),
           }),
         },
         // 最多一次工具调用，再让模型根据结果作答。
@@ -166,6 +167,11 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
       let length = 0;
       for await (const part of result.fullStream) {
         if (part.type === "tool-error") {
+          // 权限拒绝不交给模型改写，也不把底层异常暴露到浏览器。
+          if (part.error instanceof ToolAccessError) {
+            yield part.error.message;
+            return;
+          }
           throw part.error;
         } else if (part.type === "error") {
           // SDK 将连接失败放进流事件；必须作为模型故障上报，不能误判成输出截断。
