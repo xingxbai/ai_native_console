@@ -90,7 +90,10 @@ export function AskPanel() {
       const response = await fetch("/api/chat/stream", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ message: input, format: mode, context }),
+        // 只传已完成的文本问答对；失败片段、工具回复和当前问题不进入历史。
+        body: JSON.stringify({ message: input, format: mode, context,
+          history: mode === "text" ? exchanges.filter((item) => item.mode === "text" && item.status === "complete" && item.content && item.content.length <= 1000)
+            .slice(-24).map((item) => ({ question: item.question, answer: item.content })) : undefined }),
         signal: controller.signal,
       });
       if (controller.signal.aborted) return;

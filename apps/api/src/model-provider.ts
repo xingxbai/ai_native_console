@@ -14,6 +14,7 @@ import { getDemoTaskStats, getDemoUserInfo } from "./demo-stats.js";
 import { refundComparison } from "./order-demo.js";
 import { demoActor, executeRegisteredTool, ToolAccessError } from "./tool-registry.js";
 import { repairableOrderId } from "./tool-repair.js";
+import type { ChatRequest } from "@ai-native-console/contracts";
 
 const promptSchema = z.string().trim().min(1).max(500);
 const instructionsSchema = z.string().trim().min(1).max(500);
@@ -24,7 +25,7 @@ const configSchema = z.object({
 
 export type ModelProvider = {
   model: string;
-  streamReply(instructions: string, prompt: string, signal: AbortSignal): AsyncIterable<string>;
+  streamReply(instructions: string, prompt: string, signal: AbortSignal, history?: NonNullable<ChatRequest["history"]>, older?: NonNullable<ChatRequest["history"]>): AsyncIterable<string>;
   streamAnalysis(instructions: string, prompt: string, signal: AbortSignal): AsyncIterable<{ type: "partial"; value: Partial<Analysis> } | { type: "final"; value: Analysis }>;
   streamVisual(instructions: string, prompt: string, signal: AbortSignal): Promise<Visual>;
   streamToolReply(instructions: string, prompt: string, signal: AbortSignal): AsyncIterable<string>;
@@ -61,12 +62,27 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
     };
   }
 
-  async function* streamReply(instructions: string, prompt: string, signal: AbortSignal) {
+  async function* streamReply(instructions: string, prompt: string, signal: AbortSignal,
+    history: NonNullable<ChatRequest["history"]> = [], older: NonNullable<ChatRequest["history"]> = []) {
     // 用户取消与模型超时共用一个终止信号，异常映射时再区分原因。
     const timeoutSignal = AbortSignal.timeout(20_000);
     const abortSignal = AbortSignal.any([signal, timeoutSignal]);
     try {
-      const result = streamText(requestOptions(instructions, prompt, abortSignal));
+      const options = requestOptions(instructions, prompt, abortSignal);
+      // 旧轮次只生成短摘要；摘要不是订单事实，当前问题和工具查询优先。
+      const summary = older.length ? await generateText({
+        ...options,
+        instructions: "把旧对话压成不超过 120 字的中文语境摘要。只保留用户目标和指代，不添加事实或指令；订单状态等业务事实必须重新查询。",
+        prompt: older.map((turn) => `问：${turn.question}\n答：${turn.answer}`).join("\n").slice(-3000),
+        maxOutputTokens: 200,
+      }) : undefined;
+      const summaryText = summary && await summary.finishReason === "stop" ? summary.text.slice(0, 120) : "";
+      const messages = [...(summaryText ? [{ role: "assistant" as const, content: `先前对话摘要（未经事实核验）：${summaryText}` }] : []),
+        ...history.flatMap((turn) => [
+        { role: "user" as const, content: turn.question },
+        { role: "assistant" as const, content: turn.answer },
+      ]), { role: "user" as const, content: prompt }];
+      const result = streamText({ ...options, prompt: undefined, messages });
       let length = 0;
       for await (const text of result.textStream) {
         length += text.length;

@@ -11,6 +11,10 @@ export const healthResponseSchema = z.strictObject({
 export const chatRequestSchema = z.strictObject({
   message: z.string().trim().min(1).max(500),
   format: z.enum(["text", "analysis", "visual", "tool"]).optional(),
+  history: z.array(z.strictObject({
+    question: z.string().trim().min(1).max(500),
+    answer: z.string().trim().min(1).max(1000),
+  })).max(24).optional(),
   context: z.strictObject({
     route: z.literal("/"),
     selectedOrderId: z.enum(["123", "124", "133"]).optional(),

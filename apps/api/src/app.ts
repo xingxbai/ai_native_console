@@ -14,6 +14,7 @@ import { ModelOutputLimitError, ModelTimeoutError, type ModelProvider } from "./
 import { findDirectTool } from "./direct-tools.js";
 import { ToolExecutionError } from "./tool-execution.js";
 import { assembleToolInstructions, toolBudget } from "./context-budget.js";
+import { selectHistory } from "./conversation-memory.js";
 
 const SYSTEM_INSTRUCTIONS = "Answer in the user's language, briefly and directly. Use at most three short paragraphs or bullets. Do not claim access to business data or tools.";
 const ANALYSIS_INSTRUCTIONS = "Analyze the user's engineering question in their language. Give a concise summary, one concrete risk, and one actionable next step. Do not claim access to business data or tools.";
@@ -85,6 +86,8 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
 
     const requestId = request.id;
     const message = input.data.message;
+    const format = input.data.format ?? "text";
+    const history = format === "text" ? selectHistory(input.data.history ?? []) : undefined;
     // 页面线索只在工具模式进入模型；预算估算不包含 SDK 工具 Schema 开销。
     const toolContext = input.data.format === "tool"
       ? assembleToolInstructions(TOOL_INSTRUCTIONS, message, input.data.context)
@@ -92,7 +95,6 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
     if (toolContext?.overBudget) throw new ApiError("VALIDATION_ERROR", 400, "Question exceeds tool context budget");
     if (toolContext) request.log.info({ requestId, estimatedInputTokens: toolContext.estimatedInputTokens,
       inputBudget: toolBudget.input, outputReserve: toolBudget.outputReserve, omitted: toolContext.omitted }, "tool context budget");
-    const format = input.data.format ?? "text";
     const provider = modelProvider;
     const controller = new AbortController();
     const onClose = () => {
@@ -125,7 +127,7 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
             else yield frame({ type: "analysis_done", value: event.value, requestId });
           }
         } else {
-          for await (const text of provider!.streamReply(SYSTEM_INSTRUCTIONS, message, controller.signal)) {
+          for await (const text of provider!.streamReply(SYSTEM_INSTRUCTIONS, message, controller.signal, history?.recent, history?.older)) {
             yield frame({ type: "delta", text });
           }
           if (!controller.signal.aborted) yield frame({ type: "done", requestId });
