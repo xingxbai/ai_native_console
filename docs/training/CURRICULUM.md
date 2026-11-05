@@ -48,7 +48,7 @@
 
 | Day | 主题 | 学习目标 | 关键知识点 | 项目产物 | 测试/验收 | 面试覆盖 | 前置依赖 | 预计用时 | 状态 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 21 | StateGraph、Node、Edge 与条件路由 | 建立显式图状态 | StateGraph、状态 Schema、节点、条件边、循环上限 | 可观察图流程 | 合法/非法路由、最大步数、终止 | Workflow 与自由 Agent 取舍 | 11–15 | 60 分钟 | NOT_STARTED |
+| 21 | StateGraph、Node、Edge 与条件路由 | 建立显式图状态 | LangGraph 1.7、Annotation 状态、条件边、END、递归上限 | 订单查询路由命令行图 | 合法/非法路由、负数 ID 和步数上限已操作 | Workflow 与自由 Agent 取舍 | 11–15 | 60 分钟 | COMPLETED |
 | 22 | 把 Tools 接入 LangGraph Agent | 串起模型与工具节点 | ToolNode/等价机制、trace、服务端权限 | 图内工具调用链 | 错工具、异常、循环上限 | AI SDK/LangGraph 职责 | 13–15、21 | 60 分钟 | NOT_STARTED |
 | 23 | Checkpoint、thread_id 与持久化边界 | 区分内存与持久恢复 | MemorySaver 限制、checkpointer、线程授权 | checkpoint 演示、持久方案 ADR | 重启、跨线程、隔离、恢复 | checkpoint 与聊天记录区别 | 20–22 | 60 分钟 | NOT_STARTED |
 | 24 | HITL 中断与审批卡片 | 高风险动作先停后审 | interrupt、动作预览、审批主体、参数版本 | 待审批记录和卡片 | 未审批不执行、篡改参数拒绝 | 审批不能只存 boolean | 23 | 60 分钟 | NOT_STARTED |
@@ -86,7 +86,7 @@
 
 ## 排程检查
 
-- 8 周各 5 Day，共 **40 Day**；Day 01–06 已完成，Day 07–20 的剩余运行时/视觉验收见各课件，Day 21–40 仍仅有计划。
+- 8 周各 5 Day，共 **40 Day**；Day 01–06 与 Day 21 已完成，Day 07–20 的剩余运行时/视觉验收见各课件，Day 22–40 仍仅有计划。
 - 每个 Day 开始前读取本表、[进度](PROGRESS.md)、[覆盖矩阵](COVERAGE_MATRIX.md)和前一日验收；完成后记录真实测试。
 - 涉及性能或复杂边界的章节，先实现可理解的基线，观察真实问题并记录证据，再提出优化方案和对照验收；不要直接交付优化后的代码而跳过学习过程。
 - 依赖顺序：Web/API → provider/流式 → 工具/上下文/安全 → LangGraph/HITL → 工作流 → 数据/RAG/评测 → 生产化与面试。版本敏感 API 到相应 Day 才核对并安装。

@@ -85,9 +85,9 @@
 | K35 | Prompt Injection：不可信文档/工具结果不得提升为指令 | 19、32、37 | 服务端工具权限已独立；恶意文本真实模型效果待验 | 进行中 |
 | K36 | PII、JWT、密钥不可进入 Prompt、日志或 NEXT_PUBLIC | 03、16、19、35 | 四类已知格式脱敏样例通过；完整链路与变形数据待验 | 进行中 |
 | K37 | thread/session owner/tenant 隔离和并发竞态 | 20、23、37 | Day 20 单进程并发/重放已操作；owner/tenant 与多实例待验 | 进行中 |
-| K38 | LangGraph.js StateGraph、Node、Edge、状态 Schema | 21 | 合法图与非法状态迁移 | 已安排 |
-| K39 | 条件边、ToolNode/等价机制、循环/总步骤上限 | 21–22 | 无限循环强制终止、错误路径 | 已安排 |
-| K40 | Vercel AI SDK 与 LangGraph.js 的职责和集成边界 | 21–22 | SDK 负责模型/流；图负责状态/流程；避免双重执行 | 已安排 |
+| K38 | LangGraph.js StateGraph、Node、Edge、状态 Schema | 21 | Day 21 合法分支与非法输入已运行 | 已覆盖 |
+| K39 | 条件边、ToolNode/等价机制、循环/总步骤上限 | 21–22 | Day 21 条件边/递归上限已验；ToolNode 留 Day 22 | 进行中 |
+| K40 | Vercel AI SDK 与 LangGraph.js 的职责和集成边界 | 21–22 | Day 21 图独立运行；Day 22 再整合模型与工具 | 进行中 |
 | K41 | MemorySaver 仅进程内、持久 checkpointer 另选 | 23 | 重启前后能力差异测试与 ADR | 已安排 |
 | K42 | 稳定 thread_id、owner/tenant 授权与 checkpoint 恢复 | 23、25 | 跨线程/无权 resume 拒绝 | 已安排 |
 | K43 | HITL `interrupt()`、`Command` resume 与审批卡片 | 24–25 | 中断、批准、拒绝、过期测试 | 需补强：届时核对 LangGraph API |
