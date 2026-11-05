@@ -34,6 +34,7 @@ const errorMessages: Record<string, string> = {
   MODEL_INVALID_RESPONSE: "回复格式异常，请稍后重试。",
   TOOL_TIMEOUT: "数据查询超时，请稍后重试。",
   TOOL_UNAVAILABLE: "数据服务暂时不可用，请稍后重试。",
+  REQUEST_CONFLICT: "当前会话已有请求或重复提交，请稍后再试。",
   INTERNAL_ERROR: "服务暂时不可用，请稍后重试。",
   NOT_FOUND: "问答服务暂时不可用。",
 };
@@ -49,6 +50,7 @@ export function AskPanel() {
   const listRef = useRef<HTMLDivElement>(null);
   const followRef = useRef(true);
   const activeRequest = useRef<{ id: number; controller: AbortController; flush: () => void } | null>(null);
+  const sessionId = useRef<string | null>(null);
 
   // 用户查看旧记录时暂停自动跟随，新问题提交后恢复跟随。
   useEffect(() => {
@@ -66,7 +68,9 @@ export function AskPanel() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const input = message.trim();
-    if (!input || input.length > 500 || busy) return;
+    if (!input || input.length > 500 || busy || activeRequest.current) return;
+    sessionId.current ??= crypto.randomUUID();
+    const requestKey = crypto.randomUUID();
     const context = collectPageContext({ route: window.location.pathname, selectedOrderId, statusFilter });
 
     const id = ++nextId.current;
@@ -91,7 +95,7 @@ export function AskPanel() {
         method: "POST",
         headers: { "content-type": "application/json" },
         // 只传已完成的文本问答对；失败片段、工具回复和当前问题不进入历史。
-        body: JSON.stringify({ message: input, format: mode, context,
+        body: JSON.stringify({ message: input, format: mode, context, sessionId: sessionId.current, requestKey,
           history: mode === "text" ? exchanges.filter((item) => item.mode === "text" && item.status === "complete" && item.content && item.content.length <= 1000)
             .slice(-24).map((item) => ({ question: item.question, answer: item.content })) : undefined }),
         signal: controller.signal,

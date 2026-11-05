@@ -15,6 +15,7 @@ import { findDirectTool } from "./direct-tools.js";
 import { ToolExecutionError } from "./tool-execution.js";
 import { assembleToolInstructions, toolBudget } from "./context-budget.js";
 import { selectHistory } from "./conversation-memory.js";
+import { createSessionRequests } from "./session-requests.js";
 
 const SYSTEM_INSTRUCTIONS = "Answer in the user's language, briefly and directly. Use at most three short paragraphs or bullets. Do not claim access to business data or tools.";
 const ANALYSIS_INSTRUCTIONS = "Analyze the user's engineering question in their language. Give a concise summary, one concrete risk, and one actionable next step. Do not claim access to business data or tools.";
@@ -34,6 +35,7 @@ function sseFrame(id: string, event: StreamEvent): string {
 
 export function createApp(options: { logger?: boolean; modelProvider?: ModelProvider } = {}) {
   const modelProvider = options.modelProvider;
+  const sessionRequests = createSessionRequests();
   const app = Fastify({
     logger: options.logger ?? true,
     requestIdHeader: false,
@@ -83,6 +85,11 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
     if (!input.success) throw new ApiError("VALIDATION_ERROR", 400, "Invalid chat request");
     const directTool = findDirectTool(input.data.message);
     if (!modelProvider && !directTool) throw new ApiError("MODEL_UNAVAILABLE", 503, "DeepSeek is not configured");
+    const { sessionId, requestKey } = input.data;
+    if (Boolean(sessionId) !== Boolean(requestKey)) throw new ApiError("VALIDATION_ERROR", 400, "Session and request key must appear together");
+    if (sessionId && requestKey && !sessionRequests.reserve(sessionId, requestKey)) {
+      throw new ApiError("REQUEST_CONFLICT", 409, "Session has an active or duplicate request");
+    }
 
     const requestId = request.id;
     const message = input.data.message;
@@ -92,7 +99,10 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
     const toolContext = input.data.format === "tool"
       ? assembleToolInstructions(TOOL_INSTRUCTIONS, message, input.data.context)
       : undefined;
-    if (toolContext?.overBudget) throw new ApiError("VALIDATION_ERROR", 400, "Question exceeds tool context budget");
+    if (toolContext?.overBudget) {
+      if (sessionId && requestKey) sessionRequests.release(sessionId, requestKey);
+      throw new ApiError("VALIDATION_ERROR", 400, "Question exceeds tool context budget");
+    }
     if (toolContext) request.log.info({ requestId, estimatedInputTokens: toolContext.estimatedInputTokens,
       inputBudget: toolBudget.input, outputReserve: toolBudget.outputReserve, omitted: toolContext.omitted }, "tool context budget");
     const provider = modelProvider;
@@ -151,7 +161,10 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
       "x-accel-buffering": "no",
     });
     const stream = Readable.from(events());
-    stream.once("close", () => reply.raw.off("close", onClose));
+    stream.once("close", () => {
+      reply.raw.off("close", onClose);
+      if (sessionId && requestKey) sessionRequests.release(sessionId, requestKey);
+    });
     return reply.send(stream);
   });
 

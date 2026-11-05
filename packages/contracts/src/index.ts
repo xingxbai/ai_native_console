@@ -11,6 +11,8 @@ export const healthResponseSchema = z.strictObject({
 export const chatRequestSchema = z.strictObject({
   message: z.string().trim().min(1).max(500),
   format: z.enum(["text", "analysis", "visual", "tool"]).optional(),
+  sessionId: z.uuid().optional(),
+  requestKey: z.uuid().optional(),
   history: z.array(z.strictObject({
     question: z.string().trim().min(1).max(500),
     answer: z.string().trim().min(1).max(1000),
@@ -97,6 +99,7 @@ export const apiErrorCodeSchema = z.enum([
   "MODEL_INVALID_RESPONSE",
   "TOOL_TIMEOUT",
   "TOOL_UNAVAILABLE",
+  "REQUEST_CONFLICT",
 ]);
 
 export const apiErrorResponseSchema = z.strictObject({

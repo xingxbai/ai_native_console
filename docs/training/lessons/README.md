@@ -25,6 +25,7 @@
 | [Day 17：Token 预算与上下文裁剪](day-17-token-budget.md) | 工具模式应用文本预算、优先级裁剪和输出预留；真实用量待验。 |
 | [Day 18：Sliding Window 与 Summary Memory](day-18-conversation-memory.md) | 文本模式完整问答对窗口与旧对话按需摘要；真实模型待验。 |
 | [Day 19：Prompt Injection 与数据最小化](day-19-prompt-injection.md) | 模型输入已知格式脱敏和最小工具字段；注入效果待真实模型验收。 |
+| [Day 20：会话隔离、并发与重复请求](day-20-session-concurrency.md) | 页面会话 ID、单进程并发控制和同键去重；真实租户身份待实现。 |
 | [L00：仓库体检与项目骨架](L00-repository-bootstrap.md) | 旧 16 课体系的历史课件，保留用于追溯。 |
 
 每个新课件必须包含本课目标/前置、概念与流程、具体文件和**可对照源码的重点代码片段及中文说明**、通用五坑、本课专项五坑、至少三道完整面试问答、实际测试和边界、可量化验收与证据、本课小结与复盘、Git commit 建议和下一课依赖。没有运行的测试标“未执行”。
