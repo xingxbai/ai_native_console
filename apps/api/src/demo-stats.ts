@@ -18,7 +18,8 @@ export async function getDemoTaskStats(signal: AbortSignal) {
 export async function getDemoUserInfo(signal: AbortSignal) {
   // ESM 中用模块地址定位文件；不要依赖不存在的 __dirname 或进程工作目录。
   const data = await readFile(new URL("./data/userInfo.json", import.meta.url), { encoding: "utf-8", signal });
-  return JSON.parse(data);
+  const parsed = z.object({ userInfo: z.object({ id: z.number(), name: z.string(), username: z.string() }) }).parse(JSON.parse(data));
+  return parsed.userInfo;
 }
 
 export async function* streamDemoUserInfo(signal: AbortSignal) {

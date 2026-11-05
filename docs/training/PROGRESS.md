@@ -1,6 +1,6 @@
 # 学习进度
 
-更新日期：2026-11-04。**Day 01–06 已完成；Day 07–18 进行中，部分运行时与视觉验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
+更新日期：2026-11-05。**Day 01–06 已完成；Day 07–19 进行中，部分运行时与视觉验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
 
 当前练习主线：主页输入面试题或真实工程情境，DeepSeek 提供流式回复；Day 11 增加只读的公网演示统计 API 工具，以及六个基于本地演示订单 JSON 的查询、计算、表格和模型解释场景。没有真实订单系统、文档检索或审批执行。[README](../../README.md)说明现行操作，[面试题库](interview-question-bank.md)区分已实现与待实现。
 
@@ -24,7 +24,7 @@
 | 16 前端 ContextCollector | IN_PROGRESS | [Day 16 课件](lessons/day-16-frontend-context-collector.md)：首页订单选择、白名单采集、双边请求校验与工具定位指令；合法/敏感字段/路由契约操作已验，浏览器与真实模型待验。 |
 | 17 Token 预算与上下文裁剪 | IN_PROGRESS | [Day 17 课件](lessons/day-17-token-budget.md)：工具模式的文本粗估、先裁筛选再裁选中 ID、核心超预算拒绝；分级操作已验，真实 usage 和模型效果待验。 |
 | 18 Sliding Window 与 Summary Memory | IN_PROGRESS | [Day 18 课件](lessons/day-18-conversation-memory.md)：文本模式只带完整问答对，近期窗口与旧对话按需摘要；22 轮裁剪操作已验，真实模型和浏览器待验。 |
-| 19 Prompt Injection 与数据最小化 | NOT_STARTED | - |
+| 19 Prompt Injection 与数据最小化 | IN_PROGRESS | [Day 19 课件](lessons/day-19-prompt-injection.md)：模型输入已知格式脱敏、工具字段收窄和服务端数据边界指令；四类样例已验，真实模型注入和浏览器待验。 |
 | 20 会话隔离、并发与重复请求 | NOT_STARTED | - |
 | 21 StateGraph、Node、Edge 与条件路由 | NOT_STARTED | - |
 | 22 把 Tools 接入 LangGraph Agent | NOT_STARTED | - |

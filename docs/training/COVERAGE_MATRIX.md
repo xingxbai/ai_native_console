@@ -82,8 +82,8 @@
 | K32 | Token 预算、系统/工具/输出空间预留 | 17 | 超预算裁剪与成本记录 | 已安排 |
 | K33 | Sliding Window 保留完整 tool-call/result 配对 | 18 | 裁剪后消息仍合法且任务成功 | 已安排 |
 | K34 | Summary Memory 只是线索；当前事实来自 API/DB | 18、31 | 摘要与订单状态冲突以当前状态为准 | 已安排 |
-| K35 | Prompt Injection：不可信文档/工具结果不得提升为指令 | 19、32、37 | 恶意文本不越权 | 已安排 |
-| K36 | PII、JWT、密钥不可进入 Prompt、日志或 NEXT_PUBLIC | 03、16、19、35 | 脱敏与泄漏检查 | 已安排 |
+| K35 | Prompt Injection：不可信文档/工具结果不得提升为指令 | 19、32、37 | 服务端工具权限已独立；恶意文本真实模型效果待验 | 进行中 |
+| K36 | PII、JWT、密钥不可进入 Prompt、日志或 NEXT_PUBLIC | 03、16、19、35 | 四类已知格式脱敏样例通过；完整链路与变形数据待验 | 进行中 |
 | K37 | thread/session owner/tenant 隔离和并发竞态 | 20、23、37 | 跨会话读取/迟到响应被拒或隔离 | 已安排 |
 | K38 | LangGraph.js StateGraph、Node、Edge、状态 Schema | 21 | 合法图与非法状态迁移 | 已安排 |
 | K39 | 条件边、ToolNode/等价机制、循环/总步骤上限 | 21–22 | 无限循环强制终止、错误路径 | 已安排 |
