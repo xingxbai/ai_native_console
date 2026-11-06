@@ -99,6 +99,18 @@
 
 完整回答与追问见 [Day 11 课件](lessons/day-11-tool-calling.md)：1. 模型提出调用与 Node 实际请求外部 API 有何不同？2. 外部 JSON 为什么还要运行时校验？3. 为什么不把完整工具结果发给浏览器？真实 DummyJSON 数据与 DeepSeek 回答已对照，浏览器展示待验。
 
+## Day 23：Checkpoint 与线程隔离
+
+完整回答、追问和错误答案见 [Day 23 课件](lessons/day-23-checkpoint-thread-id.md)。
+
+| 题目 | 核心回答 | 追问 |
+| --- | --- | --- |
+| `thread_id` 与 checkpoint 各做什么？ | ID 定位运行线，checkpointer 保存图状态；ID 不代表权限。 | 知道 ID 就能读吗？必须由服务端校验 owner/tenant。 |
+| MemorySaver 能跨进程恢复吗？ | 不能；本课独立进程读取为空。 | 多实例呢？落到另一实例同样可能读不到。 |
+| checkpoint 与聊天记录、SSE 事件有何区别？ | 分别负责图恢复、对话内容和 UI 事件重放。 | Last-Event-ID 能恢复审批图吗？不能。 |
+
+**证据边界：** 仅验证进程内 checkpoint 与独立进程丢失；生产持久存储、真实用户鉴权、审批和 resume 未实现。
+
 ## 历史 L00
 
 旧 16 课体系的三道骨架题仍见 [L00 历史课件](lessons/L00-repository-bootstrap.md)。Day 01 采用了独立复测和更完整的面试追问结构；今后按 Day 编号更新此题库。

@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit",
     "day21:graph": "node --import tsx src/day21-graph.ts",
     "day22:agent": "node --import tsx src/day22-agent.ts",
+    "day23:checkpoint": "node --import tsx src/day23-checkpoint.ts",
     "test": "vitest run",
     "build": "tsc -p tsconfig.build.json"
   },

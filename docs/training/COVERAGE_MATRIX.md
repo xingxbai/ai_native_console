@@ -89,7 +89,7 @@
 | K39 | 条件边、ToolNode/等价机制、循环/总步骤上限 | 21–22 | Day 21 条件边/递归上限已验；Day 22 等价工具节点和固定三步已验 | 已覆盖 |
 | K40 | Vercel AI SDK 与 LangGraph.js 的职责和集成边界 | 21–22 | Day 22 真实 DeepSeek tool call 由图工具节点执行；SSE 页面仍独立 | 已覆盖 |
 | K41 | MemorySaver 仅进程内、持久 checkpointer 另选 | 23 | 重启前后能力差异测试与 ADR | 已安排 |
-| K42 | 稳定 thread_id、owner/tenant 授权与 checkpoint 恢复 | 23、25 | 跨线程/无权 resume 拒绝 | 已安排 |
+| K42 | 稳定 thread_id、owner/tenant 授权与 checkpoint 恢复 | 23、25 | Day 23 已验内存同线程/跨线程与演示 owner 拒绝；持久恢复、真实租户授权和无权 resume 留 Day 25 | 部分完成 |
 | K43 | HITL `interrupt()`、`Command` resume 与审批卡片 | 24–25 | 中断、批准、拒绝、过期测试 | 需补强：届时核对 LangGraph API |
 | K44 | 审批绑定 runId/toolCallId/参数哈希/审批人/有效期 | 24–25 | 参数篡改、非审批人、过期拒绝 | 已安排 |
 | K45 | 审批后二次鉴权、数据版本与幂等副作用 | 25、29、37 | 重复确认只执行一次 | 已安排 |

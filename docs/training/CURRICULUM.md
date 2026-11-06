@@ -50,7 +50,7 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 21 | StateGraph、Node、Edge 与条件路由 | 建立显式图状态 | LangGraph 1.7、Annotation 状态、条件边、END、递归上限 | 订单查询路由命令行图 | 合法/非法路由、负数 ID 和步数上限已操作 | Workflow 与自由 Agent 取舍 | 11–15 | 60 分钟 | COMPLETED |
 | 22 | 把 Tools 接入 LangGraph Agent | 串起模型与工具节点 | 原生 tool call、图工具节点、trace、服务端权限 | 独立订单查询图命令 | 真实 123/999、缺编号、未知工具已验 | AI SDK/LangGraph 职责 | 13–15、21 | 60 分钟 | COMPLETED |
-| 23 | Checkpoint、thread_id 与持久化边界 | 区分内存与持久恢复 | MemorySaver 限制、checkpointer、线程授权 | checkpoint 演示、持久方案 ADR | 重启、跨线程、隔离、恢复 | checkpoint 与聊天记录区别 | 20–22 | 60 分钟 | NOT_STARTED |
+| 23 | Checkpoint、thread_id 与持久化边界 | 区分内存与持久恢复 | MemorySaver 限制、checkpointer、线程授权 | checkpoint 演示、持久方案 ADR | 重启、跨线程、隔离、恢复 | checkpoint 与聊天记录区别 | 20–22 | 60 分钟 | COMPLETED |
 | 24 | HITL 中断与审批卡片 | 高风险动作先停后审 | interrupt、动作预览、审批主体、参数版本 | 待审批记录和卡片 | 未审批不执行、篡改参数拒绝 | 审批不能只存 boolean | 23 | 60 分钟 | NOT_STARTED |
 | 25 | Resume、拒绝审批与安全恢复 | 安全恢复或终止 | Command resume、审批鉴权、过期、并发、幂等 | 批准/拒绝/过期路径 | 非审批人、重复审批、过期、重启 | Resume 防越权与重放 | 24 | 60 分钟 | NOT_STARTED |
 
@@ -86,7 +86,7 @@
 
 ## 排程检查
 
-- 8 周各 5 Day，共 **40 Day**；Day 01–06 与 Day 21–22 已完成，Day 07–20 的剩余运行时/视觉验收见各课件，Day 23–40 仍仅有计划。
+- 8 周各 5 Day，共 **40 Day**；Day 01–06 与 Day 21–23 已完成，Day 07–20 的剩余运行时/视觉验收见各课件，Day 24–40 仍仅有计划。
 - 每个 Day 开始前读取本表、[进度](PROGRESS.md)、[覆盖矩阵](COVERAGE_MATRIX.md)和前一日验收；完成后记录真实测试。
 - 涉及性能或复杂边界的章节，先实现可理解的基线，观察真实问题并记录证据，再提出优化方案和对照验收；不要直接交付优化后的代码而跳过学习过程。
 - 依赖顺序：Web/API → provider/流式 → 工具/上下文/安全 → LangGraph/HITL → 工作流 → 数据/RAG/评测 → 生产化与面试。版本敏感 API 到相应 Day 才核对并安装。
