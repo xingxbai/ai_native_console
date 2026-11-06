@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { loadDeepSeekConfig } from "./config.js";
-import { createOrderAgentGraph, createOrderAgentGraphDemo } from "./order-agent-graph.js";
+import { createOrderAgentGraphDemo } from "./order-agent-graph.js";
 
 // 课程命令直接读取已有本地密钥文件，不启动 HTTP 服务，也不输出密钥。
 const localEnv = fileURLToPath(new URL("../.env.local", import.meta.url));

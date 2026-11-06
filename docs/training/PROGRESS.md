@@ -1,6 +1,6 @@
 # 学习进度
 
-更新日期：2026-11-06。**Day 01–06 与 Day 21–23 已完成；Day 07–20 进行中，部分运行时与视觉验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
+更新日期：2026-11-06。**Day 01–06 与 Day 21–25 已完成；Day 07–20 进行中，部分运行时与视觉验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
 
 当前练习主线：主页输入面试题或真实工程情境，DeepSeek 提供流式回复；Day 11 增加只读的公网演示统计 API 工具，以及六个基于本地演示订单 JSON 的查询、计算、表格和模型解释场景。没有真实订单系统、文档检索或审批执行。[README](../../README.md)说明现行操作，[面试题库](interview-question-bank.md)区分已实现与待实现。
 
@@ -29,8 +29,8 @@
 | 21 StateGraph、Node、Edge 与条件路由 | COMPLETED | [Day 21 课件](lessons/day-21-stategraph-routing.md)：LangGraph 订单查询路由图；状态/详情、非法输入和递归上限已操作，lint/typecheck、现有测试通过。未接模型或工具。 |
 | 22 把 Tools 接入 LangGraph Agent | COMPLETED | [Day 22 课件](lessons/day-22-tools-in-langgraph.md)：独立 DeepSeek → 受保护订单工具 → DeepSeek 回答图；真实 123 成功、999 越权拒绝，缺编号/未知工具已验。未接页面。 |
 | 23 Checkpoint、thread_id 与持久化边界 | COMPLETED | [Day 23 课件](lessons/day-23-checkpoint-thread-id.md)：同线程计数 2、跨线程空、越权拒绝、独立进程新内存为空；持久方案见 [ADR](adr/day-23-checkpoint-persistence.md)。 |
-| 24 HITL 中断与审批卡片 | NOT_STARTED | - |
-| 25 Resume、拒绝审批与安全恢复 | NOT_STARTED | - |
+| 24 HITL 中断与审批卡片 | COMPLETED | [Day 24 课件](lessons/day-24-hitl-interrupt.md)：独立图在订单写入前 interrupt；命令输出审批卡片数据和预览，订单状态未变。页面卡片、持久审批与安全 resume 尚未实现。 |
+| 25 Resume、拒绝审批与安全恢复 | COMPLETED | [Day 25 课件](lessons/day-25-resume-safety.md)：单进程 `Command` resume 验证批准、拒绝、非审批人、过期、篡改、重复和订单版本变化；生产持久与并发保障未实现。 |
 | 26 React Flow 工作流设计器 | NOT_STARTED | - |
 | 27 工作流版本化与静态校验 | NOT_STARTED | - |
 | 28 Run 状态机与实时执行事件 | NOT_STARTED | - |

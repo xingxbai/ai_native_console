@@ -10,6 +10,8 @@
     "day21:graph": "node --import tsx src/day21-graph.ts",
     "day22:agent": "node --import tsx src/day22-agent.ts",
     "day23:checkpoint": "node --import tsx src/day23-checkpoint.ts",
+    "day24:approval": "node --import tsx src/day24-approval.ts",
+    "day25:resume": "node --import tsx src/day25-resume.ts",
     "test": "vitest run",
     "build": "tsc -p tsconfig.build.json"
   },

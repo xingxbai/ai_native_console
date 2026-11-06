@@ -29,6 +29,8 @@
 | [Day 21：StateGraph、Node、Edge 与条件路由](day-21-stategraph-routing.md) | LangGraph 订单查询状态/详情路由与运行轨迹；模型和工具留给 Day 22。 |
 | [Day 22：把 Tools 接入 LangGraph Agent](day-22-tools-in-langgraph.md) | 独立真实 DeepSeek 工具图，订单 123 成功、999 拒绝；页面链路未接入。 |
 | [Day 23：Checkpoint、thread_id 与持久化边界](day-23-checkpoint-thread-id.md) | 同线程 checkpoint、跨线程隔离和独立进程内存丢失；生产持久方案仅记录 ADR。 |
+| [Day 24：HITL 中断与审批卡片](day-24-hitl-interrupt.md) | 独立命令输出订单变更预览和待审批卡片数据，在写入前中断；尚无页面卡片或恢复入口。 |
+| [Day 25：Resume、拒绝审批与安全恢复](day-25-resume-safety.md) | 单进程图恢复演练：批准、拒绝、越权、过期、篡改、重复和订单版本变化。 |
 | [L00：仓库体检与项目骨架](L00-repository-bootstrap.md) | 旧 16 课体系的历史课件，保留用于追溯。 |
 
 每个新课件必须包含本课目标/前置、概念与流程、具体文件和**可对照源码的重点代码片段及中文说明**、通用五坑、本课专项五坑、至少三道完整面试问答、实际测试和边界、可量化验收与证据、本课小结与复盘、Git commit 建议和下一课依赖。没有运行的测试标“未执行”。

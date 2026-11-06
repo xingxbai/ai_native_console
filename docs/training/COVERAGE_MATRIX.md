@@ -89,10 +89,10 @@
 | K39 | 条件边、ToolNode/等价机制、循环/总步骤上限 | 21–22 | Day 21 条件边/递归上限已验；Day 22 等价工具节点和固定三步已验 | 已覆盖 |
 | K40 | Vercel AI SDK 与 LangGraph.js 的职责和集成边界 | 21–22 | Day 22 真实 DeepSeek tool call 由图工具节点执行；SSE 页面仍独立 | 已覆盖 |
 | K41 | MemorySaver 仅进程内、持久 checkpointer 另选 | 23 | 重启前后能力差异测试与 ADR | 已安排 |
-| K42 | 稳定 thread_id、owner/tenant 授权与 checkpoint 恢复 | 23、25 | Day 23 已验内存同线程/跨线程与演示 owner 拒绝；持久恢复、真实租户授权和无权 resume 留 Day 25 | 部分完成 |
-| K43 | HITL `interrupt()`、`Command` resume 与审批卡片 | 24–25 | 中断、批准、拒绝、过期测试 | 需补强：届时核对 LangGraph API |
-| K44 | 审批绑定 runId/toolCallId/参数哈希/审批人/有效期 | 24–25 | 参数篡改、非审批人、过期拒绝 | 已安排 |
-| K45 | 审批后二次鉴权、数据版本与幂等副作用 | 25、29、37 | 重复确认只执行一次 | 已安排 |
+| K42 | 稳定 thread_id、owner/tenant 授权与 checkpoint 恢复 | 23、25 | Day 23 内存线程隔离、Day 25 同进程恢复已验；持久恢复与真实租户授权未实现 | 部分完成 |
+| K43 | HITL `interrupt()`、`Command` resume 与审批卡片 | 24–25 | 中断、批准、拒绝、过期命令已验；浏览器卡片未实现 | 部分完成 |
+| K44 | 审批绑定 runId/toolCallId/参数哈希/审批人/有效期 | 24–25 | 演示哈希、非审批人、过期拒绝已验；持久审批记录及 toolCallId 绑定未实现 | 部分完成 |
+| K45 | 审批后二次鉴权、数据版本与幂等副作用 | 25、29、37 | 版本变化与顺序重复确认已拒绝；原子幂等和真实鉴权未实现 | 部分完成 |
 | K46 | React/Next App Router/TypeScript/Tailwind | 01、06、10 | 静态页已构建；后续交互/布局测试 | 已安排；01 已复测 |
 | K47 | Zustand 只承载跨组件会话/run/审批状态 | 06、28 | Day 06 单组件使用 React state；跨组件状态留给 Day 28 | 已安排；06 已解释取舍 |
 | K48 | ECharts 只接收验证过的数据与固定容器 | 10、31 | ECharts option 由应用生成，模型仅提供最多 8 行数值；真实图表尺寸待验 | 10 代码已做，视觉待验 |
