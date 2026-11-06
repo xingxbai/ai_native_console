@@ -86,8 +86,8 @@
 | K36 | PII、JWT、密钥不可进入 Prompt、日志或 NEXT_PUBLIC | 03、16、19、35 | 四类已知格式脱敏样例通过；完整链路与变形数据待验 | 进行中 |
 | K37 | thread/session owner/tenant 隔离和并发竞态 | 20、23、37 | Day 20 单进程并发/重放已操作；owner/tenant 与多实例待验 | 进行中 |
 | K38 | LangGraph.js StateGraph、Node、Edge、状态 Schema | 21 | Day 21 合法分支与非法输入已运行 | 已覆盖 |
-| K39 | 条件边、ToolNode/等价机制、循环/总步骤上限 | 21–22 | Day 21 条件边/递归上限已验；ToolNode 留 Day 22 | 进行中 |
-| K40 | Vercel AI SDK 与 LangGraph.js 的职责和集成边界 | 21–22 | Day 21 图独立运行；Day 22 再整合模型与工具 | 进行中 |
+| K39 | 条件边、ToolNode/等价机制、循环/总步骤上限 | 21–22 | Day 21 条件边/递归上限已验；Day 22 等价工具节点和固定三步已验 | 已覆盖 |
+| K40 | Vercel AI SDK 与 LangGraph.js 的职责和集成边界 | 21–22 | Day 22 真实 DeepSeek tool call 由图工具节点执行；SSE 页面仍独立 | 已覆盖 |
 | K41 | MemorySaver 仅进程内、持久 checkpointer 另选 | 23 | 重启前后能力差异测试与 ADR | 已安排 |
 | K42 | 稳定 thread_id、owner/tenant 授权与 checkpoint 恢复 | 23、25 | 跨线程/无权 resume 拒绝 | 已安排 |
 | K43 | HITL `interrupt()`、`Command` resume 与审批卡片 | 24–25 | 中断、批准、拒绝、过期测试 | 需补强：届时核对 LangGraph API |

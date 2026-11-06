@@ -179,3 +179,11 @@
 - 问：State、Node、Edge 各负责什么？答：State 保存运行数据，Node 更新局部字段，Edge 决定后续节点。追问：两分支为什么用图？为后续工具、审批和恢复建立显式流程；当前 `if` 也足够。
 - 问：如何阻止非法分支和无限循环？答：Zod 限定输入，条件边只映射两路，分支连 END，并设置 recursionLimit。追问：上限为 1 时怎样？已观察到 `GraphRecursionError`。
 - 问：LangGraph 与 AI SDK 目前各管什么？答：图只做订单查询路径规划，AI SDK 仍处理现有 DeepSeek 请求与流；两者尚未接在一起。追问：图已查订单了吗？没有。
+
+## Day 22：把 Tools 接入 LangGraph Agent
+
+完整回答、追问和错误答案见 [Day 22 课件](lessons/day-22-tools-in-langgraph.md)。
+
+- 问：模型提出工具调用是否等于工具已执行？答：不等于；图工具节点在 Node 注册表校验并执行。追问：999 的权限谁判断？服务端。
+- 问：为什么校验模型输出的订单号？答：Schema 不保证编号来自用户问题；本课比对明确编号并做权限检查。追问：没编号怎么办？先拒绝，不猜。
+- 问：AI SDK 与 LangGraph 怎么分工？答：SDK 调 DeepSeek 产生 tool call，图编排节点，注册表管权限。追问：checkpoint/审批有了吗？没有。

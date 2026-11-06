@@ -1,6 +1,6 @@
 # AI Native Console
 
-面向 AI Agent 工程面试与实际开发情境的个人学习项目。Day 01–06 与 Day 21 已完成，Day 07–20 的剩余运行时与视觉验收见课件。首页输入面试题或场景题，由 DeepSeek 回答；只读演示工具可查询本地 JSON 与 JSONPlaceholder 统计数据。Day 21 有独立的 LangGraph 路由练习，但尚未接入问答链路；模型不读取真实业务系统，审批尚未实现。
+面向 AI Agent 工程面试与实际开发情境的个人学习项目。Day 01–06 与 Day 21–22 已完成，Day 07–20 的剩余运行时与视觉验收见课件。首页输入面试题或场景题，由 DeepSeek 回答；只读演示工具可查询本地 JSON 与 JSONPlaceholder 统计数据。Day 21–22 有独立的 LangGraph 路由与真实工具练习，尚未接入页面问答链路；模型不读取真实业务系统，审批尚未实现。
 
 ## 运行
 
