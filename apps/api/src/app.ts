@@ -16,6 +16,7 @@ import { ToolExecutionError } from "./tool-execution.js";
 import { assembleToolInstructions, toolBudget } from "./context-budget.js";
 import { selectHistory } from "./conversation-memory.js";
 import { createSessionRequests } from "./session-requests.js";
+import { validateWorkflow } from "./workflow-validation.js";
 
 const SYSTEM_INSTRUCTIONS = "Answer in the user's language, briefly and directly. Use at most three short paragraphs or bullets. Do not claim access to business data or tools.";
 const ANALYSIS_INSTRUCTIONS = "Analyze the user's engineering question in their language. Give a concise summary, one concrete risk, and one actionable next step. Do not claim access to business data or tools.";
@@ -79,6 +80,9 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
     }
     return healthResponseSchema.parse({ status: "ok" });
   });
+
+  // 只做发布前检查；不会保存、发布或执行浏览器提交的工作流。
+  app.post("/api/v1/workflows/validate", async (request) => validateWorkflow(request.body));
 
   app.post("/api/v1/chat/stream", async (request, reply) => {
     const input = chatRequestSchema.safeParse(request.body);

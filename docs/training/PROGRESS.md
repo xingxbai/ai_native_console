@@ -1,6 +1,6 @@
 # 学习进度
 
-更新日期：2026-11-06。**Day 01–06 与 Day 21–25 已完成；Day 07–20 进行中，部分运行时与视觉验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
+更新日期：2026-11-06。**Day 01–06 与 Day 21–25 已完成；Day 07–20 和 Day 26–27 进行中，部分运行时与视觉验收待完成。** Day 03 曾应用户要求先于 Day 02 实施，Day 02 已随后补齐；后续主题仍按 [40 Day 总表](CURRICULUM.md) 推进。用户已要求移除全部 Mock 模型逻辑，当前问答只使用 DeepSeek。从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
 
 当前练习主线：主页输入面试题或真实工程情境，DeepSeek 提供流式回复；Day 11 增加只读的公网演示统计 API 工具，以及六个基于本地演示订单 JSON 的查询、计算、表格和模型解释场景。没有真实订单系统、文档检索或审批执行。[README](../../README.md)说明现行操作，[面试题库](interview-question-bank.md)区分已实现与待实现。
 
@@ -31,8 +31,8 @@
 | 23 Checkpoint、thread_id 与持久化边界 | COMPLETED | [Day 23 课件](lessons/day-23-checkpoint-thread-id.md)：同线程计数 2、跨线程空、越权拒绝、独立进程新内存为空；持久方案见 [ADR](adr/day-23-checkpoint-persistence.md)。 |
 | 24 HITL 中断与审批卡片 | COMPLETED | [Day 24 课件](lessons/day-24-hitl-interrupt.md)：独立图在订单写入前 interrupt；命令输出审批卡片数据和预览，订单状态未变。页面卡片、持久审批与安全 resume 尚未实现。 |
 | 25 Resume、拒绝审批与安全恢复 | COMPLETED | [Day 25 课件](lessons/day-25-resume-safety.md)：单进程 `Command` resume 验证批准、拒绝、非审批人、过期、篡改、重复和订单版本变化；生产持久与并发保障未实现。 |
-| 26 React Flow 工作流设计器 | NOT_STARTED | - |
-| 27 工作流版本化与静态校验 | NOT_STARTED | - |
+| 26 React Flow 工作流设计器 | IN_PROGRESS | [Day 26 课件](lessons/day-26-workflow-designer.md)：`/workflow` 画布、节点/边编辑与 JSON 预览已实现，lint/typecheck/现有测试通过；浏览器交互、长标签和手机布局待手动验收。 |
+| 27 工作流版本化与静态校验 | IN_PROGRESS | [Day 27 课件](lessons/day-27-workflow-validation.md)：服务端版本/节点/边/环路校验和同源按钮已实现；命令与 Fastify 路由已验，浏览器点击待验。 |
 | 28 Run 状态机与实时执行事件 | NOT_STARTED | - |
 | 29 副作用保护与补偿策略 | NOT_STARTED | - |
 | 30 超时、重试、取消与恢复演练 | NOT_STARTED | - |

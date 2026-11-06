@@ -16,6 +16,7 @@ export default async function Home() {
             <span className="text-base font-semibold">AI Native Console</span>
           </div>
           <div className="flex items-center gap-5">
+            <Link href="/workflow" className="text-sm font-medium text-[#207a74] hover:underline">工作流</Link>
             <Link href="/navigation-check" className="text-sm font-medium text-[#207a74] hover:underline">切换页面</Link>
             <span className={`text-xs font-medium ${apiHealth.status === "connected" ? "text-[#2d6847]" : "text-[#a04237]"}`}>
               <span aria-hidden="true">{apiHealth.status === "connected" ? "●" : "○"}</span>{" "}

@@ -12,6 +12,7 @@
     "day23:checkpoint": "node --import tsx src/day23-checkpoint.ts",
     "day24:approval": "node --import tsx src/day24-approval.ts",
     "day25:resume": "node --import tsx src/day25-resume.ts",
+    "day27:validate": "node --import tsx src/day27-validate.ts",
     "test": "vitest run",
     "build": "tsc -p tsconfig.build.json"
   },
