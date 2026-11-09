@@ -1,0 +1,66 @@
+{
+  "documents": [
+    {
+      "id": "refund-policy",
+      "title": "退款处理手册",
+      "tenantId": "demo-a",
+      "roles": ["support", "manager"],
+      "versions": [
+        {
+          "version": 1,
+          "active": false,
+          "sections": [
+            { "id": "deadline", "heading": "退款时限", "content": "旧版规则：客户签收后 7 天内可以申请退款。" }
+          ]
+        },
+        {
+          "version": 2,
+          "active": true,
+          "sections": [
+            { "id": "deadline", "heading": "退款时限", "content": "客户签收后 14 天内可以申请退款；超过 14 天须由人工客服核实特殊情况。" },
+            { "id": "evidence", "heading": "商品瑕疵材料", "content": "商品瑕疵退款需要客户上传照片和订单号，客服核对后再发起退款。" },
+            { "id": "approval", "heading": "大额退款", "content": "退款金额超过 1000 元时，客服提交申请后由退款主管审批；审批前不得执行退款。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "incident-guide",
+      "title": "处理失败排查手册",
+      "tenantId": "demo-a",
+      "roles": ["support", "manager"],
+      "versions": [
+        {
+          "version": 1,
+          "active": true,
+          "sections": [
+            { "id": "timeout", "heading": "超时排查", "content": "处理失败代码 TIMEOUT 表示请求等待超时。先核对请求 ID、上游响应时间和重试记录，不能仅凭代码断定网络故障。" },
+            { "id": "rejected", "heading": "上游拒绝排查", "content": "处理失败代码 REJECTED 表示上游拒绝请求。先检查参数和上游返回码，再决定是否联系运营商。" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manager-only",
+      "title": "主管内部规则",
+      "tenantId": "demo-a",
+      "roles": ["manager"],
+      "versions": [
+        { "version": 1, "active": true, "sections": [
+          { "id": "audit", "heading": "内部审计", "content": "主管审批记录需要保留审批人、时间、订单版本和参数摘要。" }
+        ] }
+      ]
+    },
+    {
+      "id": "other-tenant",
+      "title": "其他租户手册",
+      "tenantId": "demo-b",
+      "roles": ["support"],
+      "versions": [
+        { "version": 1, "active": true, "sections": [
+          { "id": "secret", "heading": "专属规则", "content": "租户 B 的特殊退款政策是 30 天。" }
+        ] }
+      ]
+    }
+  ]
+}

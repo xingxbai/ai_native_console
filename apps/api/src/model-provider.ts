@@ -16,6 +16,7 @@ import { demoActor, executeRegisteredTool, ToolAccessError } from "./tool-regist
 import { repairableOrderId } from "./tool-repair.js";
 import type { ChatRequest } from "@ai-native-console/contracts";
 import { redactSensitiveText } from "./sensitive-data.js";
+import { analyticsQuerySchema, demoAnalyticsActor, getFailureBreakdown, getOperatorMetrics, getOrderMetrics } from "./business-analytics.js";
 
 const promptSchema = z.string().trim().min(1).max(500);
 const instructionsSchema = z.string().trim().min(1).max(500);
@@ -179,6 +180,21 @@ export function createDeepSeekProvider(input: unknown): ModelProvider {
             description: "当用户询问演示员工某个月的迟到或缺卡情况时调用。必须提供员工编号和月份，月份格式为 YYYY-MM；用户没说月份时先追问，不要猜测。只使用工具返回的该月记录；没有该月记录不能说员工不存在。",
             inputSchema: getAttendanceDetailsInputSchema,
             execute: async (input) => executeRegisteredTool("getAttendanceDetails", input, demoActor, abortSignal),
+          }),
+          getOrderMetrics: tool({
+            description: "查询演示统计系统在明确日期范围内的处理尝试总数、失败次数和失败率。日期必须由用户提供，不可猜测；失败率分母为全部处理尝试。仅返回服务端授权租户的数据。",
+            inputSchema: analyticsQuerySchema,
+            execute: async (input) => getOrderMetrics(input, demoAnalyticsActor, abortSignal),
+          }),
+          getOperatorMetrics: tool({
+            description: "按运营商统计演示处理尝试和失败率。用户必须明确给出起止日期；可选广东或浙江省份。无记录的运营商失败率为 null，不可解释为 0%。",
+            inputSchema: analyticsQuerySchema,
+            execute: async (input) => getOperatorMetrics(input, demoAnalyticsActor, abortSignal),
+          }),
+          getFailureBreakdown: tool({
+            description: "按失败代码统计演示处理失败原因，只返回超时和上游拒绝的次数。用户必须明确给出起止日期；可选省份。原因分布不能证明故障根因。",
+            inputSchema: analyticsQuerySchema,
+            execute: async (input) => getFailureBreakdown(input, demoAnalyticsActor, abortSignal),
           }),
         },
         // 最多一次工具调用，再让模型根据结果作答。

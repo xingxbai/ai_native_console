@@ -1,0 +1,14 @@
+{
+  "source": "演示统计系统",
+  "records": [
+    { "id": "e01", "tenantId": "demo-a", "date": "2026-10-28", "province": "广东", "operator": "移动", "status": "success", "failureCode": null },
+    { "id": "e02", "tenantId": "demo-a", "date": "2026-10-28", "province": "广东", "operator": "移动", "status": "failed", "failureCode": "TIMEOUT" },
+    { "id": "e03", "tenantId": "demo-a", "date": "2026-10-29", "province": "广东", "operator": "联通", "status": "failed", "failureCode": "REJECTED" },
+    { "id": "e04", "tenantId": "demo-a", "date": "2026-10-29", "province": "浙江", "operator": "移动", "status": "success", "failureCode": null },
+    { "id": "e05", "tenantId": "demo-a", "date": "2026-10-30", "province": "广东", "operator": "联通", "status": "success", "failureCode": null },
+    { "id": "e06", "tenantId": "demo-a", "date": "2026-10-30", "province": "浙江", "operator": "电信", "status": "failed", "failureCode": "TIMEOUT" },
+    { "id": "e07", "tenantId": "demo-a", "date": "2026-10-31", "province": "广东", "operator": "移动", "status": "failed", "failureCode": "TIMEOUT" },
+    { "id": "e08", "tenantId": "demo-a", "date": "2026-11-01", "province": "浙江", "operator": "电信", "status": "success", "failureCode": null },
+    { "id": "e09", "tenantId": "demo-b", "date": "2026-10-29", "province": "广东", "operator": "移动", "status": "failed", "failureCode": "REJECTED" }
+  ]
+}

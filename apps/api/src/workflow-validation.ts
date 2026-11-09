@@ -53,5 +53,6 @@ export function validateWorkflow(input: unknown): { valid: boolean; issues: stri
     if (reachable.size !== nodes.length) issues.push("存在无法从起点到达的节点");
   }
   if (nodes.some((node) => node.type !== "end" && (neighbors.get(node.id)?.length ?? 0) === 0)) issues.push("非结束节点缺少后续连线");
+  if (nodes.some((node) => node.type !== "end" && (neighbors.get(node.id)?.length ?? 0) > 1)) issues.push("每个节点只能连接一个后续节点");
   return { valid: issues.length === 0, issues: [...new Set(issues)] };
 }

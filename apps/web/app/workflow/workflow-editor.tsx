@@ -6,10 +6,12 @@ import {
   useEdgesState, useNodesState, type Connection, type Edge, type Node, type NodeProps,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { SseParser } from "../../lib/sse";
 
 type StepType = "query" | "approval" | "end";
 type StepData = { label: string; stepType: StepType };
 type StepNode = Node<StepData, "step">;
+type RunEvent = { runId: string; sequence: number; status: string; nodeId?: string; message: string };
 
 const names: Record<StepType, string> = { query: "查询", approval: "人工审批", end: "结束" };
 const colors: Record<StepType, string> = { query: "#207a74", approval: "#af7028", end: "#52646b" };
@@ -43,6 +45,8 @@ export function WorkflowEditor() {
   const [notice, setNotice] = useState("");
   const [showJson, setShowJson] = useState(false);
   const [validation, setValidation] = useState<{ valid: boolean; issues: string[] } | null>(null);
+  const [events, setEvents] = useState<RunEvent[]>([]);
+  const [running, setRunning] = useState(false);
   const selected = nodes.find((node) => node.id === selectedId);
   const nodeTypes = useMemo(() => ({ step: Step }), []);
 
@@ -90,6 +94,32 @@ export function WorkflowEditor() {
     } catch { setValidation({ valid: false, issues: ["校验服务暂不可用"] }); }
   }
 
+  async function runDraft() {
+    setRunning(true);
+    setEvents([]);
+    setNotice("");
+    try {
+      const response = await fetch("/api/workflows/run", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(workflow) });
+      if (!response.ok || !response.body) throw new Error("流程结构不合法或运行服务不可用");
+      const reader = response.body.getReader();
+      const parser = new SseParser();
+      let lastSequence = 0;
+      let runId = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        for (const frame of parser.feed(value)) {
+          const event = JSON.parse(frame.data) as RunEvent;
+          if (frame.event !== "run" || event.sequence !== ++lastSequence || (runId && runId !== event.runId) || frame.id !== `${event.runId}:${event.sequence}`) throw new Error("运行事件顺序错误");
+          runId = event.runId;
+          setEvents((current) => [...current, event]);
+        }
+      }
+      parser.finish();
+    } catch (error) { setNotice(error instanceof Error ? error.message : "运行失败"); }
+    finally { setRunning(false); }
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -97,6 +127,7 @@ export function WorkflowEditor() {
         <div className="flex flex-wrap gap-2">
           {(["query", "approval", "end"] as const).map((type) => <button key={type} type="button" onClick={() => addStep(type)} className="rounded border border-[#bdcbd0] bg-white px-3 py-2 text-sm hover:bg-[#eef4f4]">添加{names[type]}</button>)}
           <button type="button" onClick={checkWorkflow} className="rounded bg-[#173c42] px-3 py-2 text-sm text-white hover:bg-[#24545a]">检查流程</button>
+          <button type="button" onClick={runDraft} disabled={running} className="rounded bg-[#207a74] px-3 py-2 text-sm text-white hover:bg-[#17645f] disabled:opacity-50">{running ? "运行中" : "运行只读流程"}</button>
           <button type="button" onClick={() => setShowJson((value) => !value)} className="rounded border border-[#bdcbd0] bg-white px-3 py-2 text-sm hover:bg-[#eef4f4]">{showJson ? "隐藏 JSON" : "查看 JSON"}</button>
         </div>
       </div>
@@ -121,6 +152,7 @@ export function WorkflowEditor() {
         </aside>
       </div>
       {showJson && <section className="mt-5"><h2 className="mb-2 text-sm font-semibold">工作流 JSON</h2><pre className="max-h-64 overflow-auto rounded border border-[#bdcbd0] bg-white p-4 text-xs">{JSON.stringify(workflow, null, 2)}</pre></section>}
+      {events.length > 0 && <section className="mt-5 border-t border-[#dbe2e5] pt-4"><h2 className="text-sm font-semibold">运行记录 · {events.at(-1)?.status}</h2><ol className="mt-3 space-y-2 text-sm">{events.map((event) => <li key={event.sequence} className="flex gap-3"><span className="w-6 shrink-0 text-[#52646b]">{event.sequence}</span><span>{event.message}</span></li>)}</ol></section>}
     </div>
   );
 }

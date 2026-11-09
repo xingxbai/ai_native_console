@@ -13,6 +13,8 @@
     "day24:approval": "node --import tsx src/day24-approval.ts",
     "day25:resume": "node --import tsx src/day25-resume.ts",
     "day27:validate": "node --import tsx src/day27-validate.ts",
+    "day31:analytics": "node --import tsx src/day31-analytics.ts",
+    "day32:knowledge": "node --import tsx src/day32-knowledge.ts",
     "test": "vitest run",
     "build": "tsc -p tsconfig.build.json"
   },
@@ -23,6 +25,7 @@
     "@langchain/langgraph": "1.7.0",
     "ai": "7.0.154",
     "fastify": "5.12.7",
+    "minisearch": "^7.2.0",
     "zod": "4.6.7"
   },
   "devDependencies": {
