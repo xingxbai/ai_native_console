@@ -38,7 +38,7 @@
 | 30 超时、重试、取消与恢复演练 | DEFERRED | 用户要求跳过 Week 6 后续课程。 |
 | 31 企业分析工具与数据口径正确性 | COMPLETED | [Day 31 课件](lessons/day-31-business-analytics.md)：三种只读聚合、7/4 口径、无数据/逆日期/越权已验；真实 DeepSeek 运营商回答与工具结果一致。 |
 | 32 RAG 数据摄取与检索基础 | IN_PROGRESS | [Day 32 课件](lessons/day-32-rag-ingestion-retrieval.md)：文档章节切块、版本/租户/角色过滤、MiniSearch 关键词检索和 API 已验；embedding/向量、页面和模型回答未实现。 |
-| 33 混合检索、重排序与引用来源 | NOT_STARTED | - |
+| 33 混合检索、重排序与引用来源 | IN_PROGRESS | [Day 33 课件](lessons/day-33-citations-refusal.md)：原文引用、固定 source ID 和无证据拒答已验；混合检索、重排序及模型综合回答未实现。 |
 | 34 Agent Golden Dataset 与回归评测 | NOT_STARTED | - |
 | 35 Tracing、日志、Token 与延迟指标 | NOT_STARTED | - |
 | 36 模型降级、限流、缓存与并发预算 | NOT_STARTED | - |

@@ -35,6 +35,7 @@ export function searchKnowledge(source: Source, input: unknown, actor: Knowledge
   index.addAll(chunks);
   const hits = index.search(query, { combineWith: "AND" }).slice(0, 3);
   return { query, results: hits.map((hit) => ({
+    sourceId: String(hit.id),
     documentId: String(hit.documentId), version: Number(hit.version), sectionId: String(hit.sectionId),
     title: String(hit.title), heading: String(hit.heading), content: String(hit.content),
   })) };

@@ -19,6 +19,7 @@ import { createSessionRequests } from "./session-requests.js";
 import { validateWorkflow } from "./workflow-validation.js";
 import { runWorkflow, sseRunFrame } from "./workflow-run.js";
 import { demoKnowledgeActor, knowledgeQuerySchema, readKnowledgeSource, searchKnowledge } from "./knowledge-search.js";
+import { answerFromKnowledge } from "./knowledge-answer.js";
 
 const SYSTEM_INSTRUCTIONS = "Answer in the user's language, briefly and directly. Use at most three short paragraphs or bullets. Do not claim access to business data or tools.";
 const ANALYSIS_INSTRUCTIONS = "Analyze the user's engineering question in their language. Give a concise summary, one concrete risk, and one actionable next step. Do not claim access to business data or tools.";
@@ -92,6 +93,12 @@ export function createApp(options: { logger?: boolean; modelProvider?: ModelProv
     const source = await readKnowledgeSource(AbortSignal.timeout(3_000));
     // 当前只使用固定演示身份；真实认证和租户注入须在生产入口实现。
     return searchKnowledge(source, parsed.data, demoKnowledgeActor);
+  });
+
+  app.post("/api/v1/knowledge/answer", async (request) => {
+    const parsed = knowledgeQuerySchema.safeParse(request.body);
+    if (!parsed.success) throw new ApiError("VALIDATION_ERROR", 400, "Invalid search query");
+    return answerFromKnowledge(parsed.data.query, demoKnowledgeActor, AbortSignal.timeout(3_000));
   });
 
   app.post("/api/v1/workflows/run", async (request, reply) => {

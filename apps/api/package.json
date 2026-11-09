@@ -15,6 +15,7 @@
     "day27:validate": "node --import tsx src/day27-validate.ts",
     "day31:analytics": "node --import tsx src/day31-analytics.ts",
     "day32:knowledge": "node --import tsx src/day32-knowledge.ts",
+    "day33:citations": "node --import tsx src/day33-citations.ts",
     "test": "vitest run",
     "build": "tsc -p tsconfig.build.json"
   },
