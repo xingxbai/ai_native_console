@@ -1,6 +1,6 @@
 # 学习进度
 
-更新日期：2026-11-06。**Day 01–06、Day 21–25 与 Day 31 已完成；Day 07–20、26–27、32 进行中；Day 28–30 应用户要求延期。** 部分运行时与视觉验收待完成。Day 03 曾先于 Day 02 实施，后者已补齐。当前问答只使用 DeepSeek；从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
+更新日期：2026-11-09。**Day 01–06、Day 21–25 与 Day 31 已完成；Day 07–20、26–27、32–34 进行中；Day 28–30 应用户要求延期。** 部分运行时与视觉验收待完成。Day 03 曾先于 Day 02 实施，后者已补齐。当前模型问答只使用 DeepSeek；从 Day 04 起不新增或修改 `.test.ts` 单元测试代码。
 
 当前练习主线：主页输入面试题或真实工程情境，DeepSeek 提供流式回复；Day 11 增加只读的公网演示统计 API 工具，以及六个基于本地演示订单 JSON 的查询、计算、表格和模型解释场景。没有真实订单系统、文档检索或审批执行。[README](../../README.md)说明现行操作，[面试题库](interview-question-bank.md)区分已实现与待实现。
 
@@ -39,7 +39,7 @@
 | 31 企业分析工具与数据口径正确性 | COMPLETED | [Day 31 课件](lessons/day-31-business-analytics.md)：三种只读聚合、7/4 口径、无数据/逆日期/越权已验；真实 DeepSeek 运营商回答与工具结果一致。 |
 | 32 RAG 数据摄取与检索基础 | IN_PROGRESS | [Day 32 课件](lessons/day-32-rag-ingestion-retrieval.md)：文档章节切块、版本/租户/角色过滤、MiniSearch 关键词检索和 API 已验；embedding/向量、页面和模型回答未实现。 |
 | 33 混合检索、重排序与引用来源 | IN_PROGRESS | [Day 33 课件](lessons/day-33-citations-refusal.md)：原文引用、固定 source ID 和无证据拒答已验；混合检索、重排序及模型综合回答未实现。 |
-| 34 Agent Golden Dataset 与回归评测 | NOT_STARTED | - |
+| 34 Agent Golden Dataset 与回归评测 | IN_PROGRESS | [Day 34 课件](lessons/day-34-golden-dataset.md)：固定样本 33/34，K11 关键词漏召回；真实 DeepSeek Agent 评测待做。 |
 | 35 Tracing、日志、Token 与延迟指标 | NOT_STARTED | - |
 | 36 模型降级、限流、缓存与并发预算 | NOT_STARTED | - |
 | 37 企业安全、RBAC、租户隔离与审计 | NOT_STARTED | - |
