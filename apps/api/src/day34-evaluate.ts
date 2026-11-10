@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 import { z } from "zod";
 import { getFailureBreakdown, getOperatorMetrics, getOrderMetrics } from "./business-analytics.js";
 import { answerFromKnowledge } from "./knowledge-answer.js";
+import { randomUUID } from "node:crypto";
+import { performance } from "node:perf_hooks";
 
 const caseSchema = z.discriminatedUnion("kind", [
   z.strictObject({ id: z.string(), kind: z.literal("knowledge"), query: z.string(),
@@ -18,9 +20,14 @@ const tools = { getOrderMetrics, getOperatorMetrics, getFailureBreakdown };
 let passed = 0;
 const failures: Array<{ id: string; reason: string }> = [];
 const byKind = { knowledge: { total: 0, passed: 0 }, analytics: { total: 0, passed: 0 } };
+const runId = randomUUID();
+const spans: Array<{ runId: string; caseId: string; kind: string; operation: string; durationMs: number; outcome: "passed" | "failed"; errorCategory?: string }> = [];
 
 for (const item of cases) {
   byKind[item.kind].total++;
+  const started = performance.now();
+  let outcome: "passed" | "failed" = "failed";
+  let errorCategory: string | undefined;
   try {
     if (item.kind === "knowledge") {
       const result = await answerFromKnowledge(item.query, { tenantId: item.tenantId ?? "demo-a", role: item.role ?? "support" }, AbortSignal.timeout(5_000));
@@ -39,12 +46,21 @@ for (const item of cases) {
     }
     passed++;
     byKind[item.kind].passed++;
+    outcome = "passed";
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
-    if (item.kind === "analytics" && item.expectedError === reason) { passed++; byKind.analytics.passed++; }
-    else failures.push({ id: item.id, reason });
+    if (item.kind === "analytics" && item.expectedError === reason) { passed++; byKind.analytics.passed++; outcome = "passed"; }
+    else { failures.push({ id: item.id, reason }); errorCategory = "EXPECTATION_MISMATCH"; }
+  } finally {
+    // 只记录用例 ID 和操作名，不写问题、工具参数或返回内容。
+    spans.push({ runId, caseId: item.id, kind: item.kind,
+      operation: item.kind === "knowledge" ? "answerFromKnowledge" : item.tool,
+      durationMs: Math.round((performance.now() - started) * 100) / 100, outcome, ...(errorCategory ? { errorCategory } : {}) });
   }
 }
 
-console.log(JSON.stringify({ total: cases.length, passed, failed: failures.length, byKind, failures }, null, 2));
+const durations = spans.map((span) => span.durationMs).sort((a, b) => a - b);
+const p95 = durations[Math.ceil(durations.length * 0.95) - 1];
+console.log(JSON.stringify({ runId, summary: { total: cases.length, passed, failed: failures.length,
+  errorRate: failures.length / cases.length, p95DurationMs: p95, tokenUsage: null, byKind }, failures, spans }, null, 2));
 // 评测集可包含已知失败；命令本身只有执行异常或数据集无效时才失败。

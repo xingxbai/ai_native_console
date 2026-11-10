@@ -37,6 +37,7 @@
 | [Day 32：RAG 数据摄取与检索基础](day-32-rag-ingestion-retrieval.md) | 章节切块、版本/权限过滤和关键词检索已验；embedding/向量待做。 |
 | [Day 33：检索引用与无证据拒答](day-33-citations-refusal.md) | 可核对的原文引用和无证据拒答已验；混合检索与重排序待做。 |
 | [Day 34：Golden Dataset 与回归评测](day-34-golden-dataset.md) | 固定样本 33/34；K11 漏召回，真实模型评测待做。 |
+| [Day 35：Tracing、日志、Token 与延迟指标](day-35-observability.md) | 本地评测输出 run/span、耗时和失败类别；真实模型 Token 与生产面板待做。 |
 | [L00：仓库体检与项目骨架](L00-repository-bootstrap.md) | 旧 16 课体系的历史课件，保留用于追溯。 |
 
 每个新课件必须包含本课目标/前置、概念与流程、具体文件和**可对照源码的重点代码片段及中文说明**、通用五坑、本课专项五坑、至少三道完整面试问答、实际测试和边界、可量化验收与证据、本课小结与复盘、Git commit 建议和下一课依赖。没有运行的测试标“未执行”。

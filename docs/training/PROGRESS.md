@@ -40,7 +40,7 @@
 | 32 RAG 数据摄取与检索基础 | IN_PROGRESS | [Day 32 课件](lessons/day-32-rag-ingestion-retrieval.md)：文档章节切块、版本/租户/角色过滤、MiniSearch 关键词检索和 API 已验；embedding/向量、页面和模型回答未实现。 |
 | 33 混合检索、重排序与引用来源 | IN_PROGRESS | [Day 33 课件](lessons/day-33-citations-refusal.md)：原文引用、固定 source ID 和无证据拒答已验；混合检索、重排序及模型综合回答未实现。 |
 | 34 Agent Golden Dataset 与回归评测 | IN_PROGRESS | [Day 34 课件](lessons/day-34-golden-dataset.md)：固定样本 33/34，K11 关键词漏召回；真实 DeepSeek Agent 评测待做。 |
-| 35 Tracing、日志、Token 与延迟指标 | NOT_STARTED | - |
+| 35 Tracing、日志、Token 与延迟指标 | IN_PROGRESS | [Day 35 课件](lessons/day-35-observability.md)：本地 34 条评测输出 run/span、失败类别和 p95；真实模型 Token 与生产观测面板未实现。 |
 | 36 模型降级、限流、缓存与并发预算 | NOT_STARTED | - |
 | 37 企业安全、RBAC、租户隔离与审计 | NOT_STARTED | - |
 | 38 Docker、环境配置与 CI 检查 | NOT_STARTED | - |

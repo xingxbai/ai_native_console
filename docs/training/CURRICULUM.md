@@ -72,7 +72,7 @@
 | 32 | RAG 数据摄取与检索基础 | 把模拟手册变为证据 | chunk、metadata、版本/权限已做；embedding/向量待做 | 关键词索引与只读检索 API | 更新、权限过滤、无结果已验 | RAG 解决/不解决什么 | 19、31 | 60 分钟 | IN_PROGRESS |
 | 33 | 混合检索、重排序与引用来源 | 给可验证引用并拒答 | source id、有效版本和无证据拒答已做；混合检索/重排序待做 | 原文引用回答与拒答 API | 引用/拒答已验；语义召回待验 | chunk 与召回/引用关系 | 32 | 60 分钟 | IN_PROGRESS |
 | 34 | Agent Golden Dataset 与回归评测 | 用固定用例衡量质量 | 工具选择、参数、完成率、引用、失败分类 | 至少 30 条起步集和报告 | 重复评测、版本对比、复盘 | 如何评估 Agent | 31–33 | 60 分钟 | IN_PROGRESS |
-| 35 | Tracing、日志、Token 与延迟指标 | 解释 run 的行为与成本 | run/trace/span、脱敏、token、延迟、错误率 | 脱敏 trace 和观测面板 | 信息排除、关联 ID、抽样 | 生产可观测性 | 28、34 | 60 分钟 | NOT_STARTED |
+| 35 | Tracing、日志、Token 与延迟指标 | 解释 run 的行为与成本 | run/trace/span、脱敏、token、延迟、错误率 | 脱敏 trace 和观测面板 | 信息排除、关联 ID、抽样 | 生产可观测性 | 28、34 | 60 分钟 | IN_PROGRESS |
 
 ## Week 8：生产化、部署与面试通关
 
